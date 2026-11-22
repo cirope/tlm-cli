@@ -1,0 +1,19 @@
+env TLM_TOKEN=tlmp_test_token_laptop
+env TLM_ORG=acme
+
+fake-tlm project.update.ok project.update.invalid project.mute.ok project.unmute.ok
+exits 0 tlm projects edit shop --name Storefront
+stdout '^Storefront \(shop\)$'
+exits 2 tlm projects edit shop
+stderr 'say the new name with --name'
+
+exits 0 tlm projects mute shop
+stdout '^shop''s issue emails are off for you\.$'
+exits 0 tlm projects unmute shop
+stdout '^shop''s issue emails are on for you\.$'
+
+# One event, told as Markdown.
+env TLM_PROJECT=shop
+fake-tlm issue.event.markdown
+exits 0 tlm issues event Err7Kq2XpAb2 00000000-0000-4000-8000-000000000001 --markdown
+stdout '^# Ecto\.NoResultsError$'

@@ -1,0 +1,29 @@
+{
+  "request": {
+    "method": "PATCH",
+    "path": "/api/v1/orgs/acme/projects/shop/issues/Err7Kq2XpAb2",
+    "body": {
+      "status": "unresolved"
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "assignee": null,
+      "culprit": "Shop.Orders.get_by_token!/1",
+      "events_count": 1,
+      "first_release": "v57",
+      "first_seen_at": "2026-11-13T12:00:00Z",
+      "id": "Err7Kq2XpAb2",
+      "last_release": "v57",
+      "last_seen_at": "2026-11-13T12:00:00Z",
+      "level": "error",
+      "platform": "elixir",
+      "status": "unresolved",
+      "subtitle": "expected at least one result but got none in query:\n\nfrom o0 in Shop.Order,\n  where: o0.token == ^\"k3J\"",
+      "title": "Ecto.NoResultsError",
+      "url": "http://tlm.test/projects/shop/issues/Err7Kq2XpAb2",
+      "users_count": 1
+    }
+  }
+}

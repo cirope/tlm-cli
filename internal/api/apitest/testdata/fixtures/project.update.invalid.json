@@ -1,0 +1,23 @@
+{
+  "request": {
+    "method": "PATCH",
+    "path": "/api/v1/orgs/acme/projects/shop",
+    "body": {
+      "name": ""
+    }
+  },
+  "response": {
+    "status": 422,
+    "body": {
+      "error": {
+        "code": "invalid",
+        "fields": {
+          "name": [
+            "can't be blank"
+          ]
+        },
+        "message": "Some values aren't valid."
+      }
+    }
+  }
+}

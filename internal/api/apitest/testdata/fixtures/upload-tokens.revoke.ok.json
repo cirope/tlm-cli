@@ -1,0 +1,10 @@
+{
+  "request": {
+    "method": "DELETE",
+    "path": "/api/v1/orgs/acme/projects/shop/upload-tokens/Upt7Kq2XpAb2"
+  },
+  "response": {
+    "status": 204,
+    "body": ""
+  }
+}

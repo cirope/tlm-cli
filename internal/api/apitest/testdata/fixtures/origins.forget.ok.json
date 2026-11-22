@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "DELETE",
+    "path": "/api/v1/orgs/acme/projects/shop/origins",
+    "query": {
+      "origin": "https://shop.example.com"
+    }
+  },
+  "response": {
+    "status": 204,
+    "body": ""
+  }
+}

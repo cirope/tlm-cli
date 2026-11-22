@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "DELETE",
+    "path": "/api/v1/orgs/acme/members/UsrAda7Kq2Xp"
+  },
+  "response": {
+    "status": 422,
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "You cannot remove yourself."
+      }
+    }
+  }
+}

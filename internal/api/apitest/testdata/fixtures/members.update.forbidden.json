@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "PATCH",
+    "path": "/api/v1/orgs/acme/members/UsrAda7Kq2Xp",
+    "body": {
+      "role": "member"
+    }
+  },
+  "response": {
+    "status": 403,
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "Your role here doesn't allow it."
+      }
+    }
+  }
+}

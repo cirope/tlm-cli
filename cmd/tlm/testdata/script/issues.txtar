@@ -1,0 +1,92 @@
+env TLM_TOKEN=tlmp_test_token_laptop
+env TLM_ORG=acme
+env TLM_PROJECT=shop
+
+fake-tlm issues.list.ok issues.list.filtered issues.list.empty
+exits 0 tlm issues list --limit 1
+stdout '^ID            LEVEL  TITLE                           EVENTS  USERS  LAST SEEN  ASSIGNEE$'
+stdout '^Err8Mn3YqBc3  error  TypeError: x is not a function  1       1      5m ago$'
+stderr '^More: --cursor cursor_test_issues$'
+
+exits 0 tlm issues list --status resolved --range all --env production --platform javascript --release web@1.4.2 --search TypeError
+stdout '^Err8Mn3YqBc3'
+
+exits 0 tlm issues list nothing matches this
+stdout '^No unresolved issues \(matching "nothing matches this"\)\.$'
+
+# -q is --quiet here too; the search is words or --search.
+exits 0 tlm issues list -q --search 'nothing matches this'
+stdout 'No unresolved issues'
+exits 2 tlm issues list nothing --search else
+stderr 'as words or as --search, not both'
+
+# A bare id without --org/--project goes through /issues/:id and its 308.
+env TLM_ORG=
+env TLM_PROJECT=
+fake-tlm issue.find.ok issue.get.ok issue.get.markdown
+exits 0 tlm issues show Err7Kq2XpAb2
+stdout '^Ecto\.NoResultsError'
+stdout '^unresolved · error · elixir · 1 event · 1 user$'
+stdout '^First seen 5m ago \(v57\) · last seen 5m ago \(v57\)$'
+stdout '^At lib/shop/orders\.ex:88 in '
+stdout '^http://127\.0\.0\.1:\d+/projects/shop/issues/Err7Kq2XpAb2$'
+stderr 'tlm issues show Err7Kq2XpAb2 --markdown'
+
+# --markdown prints Tlm's text as is. An issue's URL has no
+# organization: its id finds it, even with --org and --project set.
+exits 0 tlm issues show $URL/projects/shop/issues/Err7Kq2XpAb2 --markdown --org globex --project web
+stdout '^# Ecto\.NoResultsError$'
+stdout '^## Stacktrace$'
+stdout '^Mark it resolved: `PATCH http://127\.0\.0\.1:\d+/api/v1/orgs/acme/projects/shop/issues/Err7Kq2XpAb2`'
+
+exits 0 tlm issues show Err7Kq2XpAb2 --org acme --project shop --json
+stdout '"latest_event": \{'
+
+# A merged issue's old path answers 308 to the new one.
+fake-tlm issue.get.merged issue.get.ok
+exits 0 tlm issues show Mrg9Pq4ZrCd4 --org acme --project shop
+stdout '^Ecto\.NoResultsError'
+
+fake-tlm issue.get.not_found
+exits 1 tlm issues show Nope7Kq2XpAb --org acme --project shop
+stderr '^error: '
+
+# An issue URL on another Tlm is a usage mistake.
+exits 2 tlm issues show http://elsewhere.test/projects/b/issues/Err7Kq2XpAb2
+stderr 'that issue is on http://elsewhere\.test'
+
+env TLM_ORG=acme
+env TLM_PROJECT=shop
+fake-tlm issue.events.ok issue.event.ok issue.event.not_kept
+exits 0 tlm issues events Err7Kq2XpAb2
+stdout '^EVENT                                 OCCURRED  ENVIRONMENT  RELEASE  DETAILS$'
+stdout '^00000000-0000-4000-8000-000000000002  5m ago    prod         v57      kept$'
+
+exits 0 tlm issues event Err7Kq2XpAb2 00000000-0000-4000-8000-000000000001
+stdout '^00000000-0000-4000-8000-000000000001 · 2026-11-13 12:00:00'
+stdout '^> lib/shop/orders\.ex:88'
+
+exits 0 tlm issues event Err7Kq2XpAb2 00000000-0000-4000-8000-000000000002
+stdout 'Stored without details'
+
+# Changes: one line per issue. A pasted URL is found by its id first.
+fake-tlm issue.find.ok issue.get.ok issue.update.reopened
+env TLM_ORG=
+env TLM_PROJECT=
+exits 0 tlm issues reopen $URL/projects/shop/issues/Err7Kq2XpAb2
+stdout '^Err7Kq2XpAb2 unresolved$'
+env TLM_ORG=acme
+env TLM_PROJECT=shop
+
+fake-tlm issue.update.resolved issue.update.ignored issue.update.reopened issue.update.assigned issue.update.unassigned issue.update.not_member
+exits 0 tlm issues resolve Err7Kq2XpAb2
+stdout '^Err7Kq2XpAb2 resolved$'
+exits 0 tlm issues ignore Err7Kq2XpAb2
+stdout '^Err7Kq2XpAb2 ignored$'
+exits 0 tlm issues assign Err7Kq2XpAb2 me
+stdout '^Err7Kq2XpAb2 assigned to ada@example\.com$'
+exits 0 tlm issues assign Err7Kq2XpAb2 none
+stdout '^Err7Kq2XpAb2 unassigned$'
+exits 1 tlm issues assign Err7Kq2XpAb2 stranger@example.com
+stderr '^error: Err7Kq2XpAb2: Some values aren''t valid\.$'
+stderr '^  assignee: isn''t a member of this organization$'

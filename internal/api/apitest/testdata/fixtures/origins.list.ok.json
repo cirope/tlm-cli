@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/orgs/acme/projects/shop/origins"
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "data": [
+        {
+          "created_at": "2026-11-13T12:00:00Z",
+          "origin": "https://shop.example.com",
+          "status": "pending"
+        }
+      ],
+      "next_cursor": null
+    }
+  }
+}

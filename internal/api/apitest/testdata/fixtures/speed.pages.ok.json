@@ -1,0 +1,36 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/orgs/acme/projects/shop/speed/pages"
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "data": [
+        {
+          "inp": null,
+          "inp_samples": 0,
+          "lcp": 5200,
+          "lcp_samples": 1,
+          "nav": null,
+          "nav_samples": 0,
+          "navigation": "hard",
+          "route": "/checkout",
+          "views": 1
+        },
+        {
+          "inp": 150,
+          "inp_samples": 2,
+          "lcp": 2600,
+          "lcp_samples": 2,
+          "nav": null,
+          "nav_samples": 0,
+          "navigation": "hard",
+          "route": "/",
+          "views": 2
+        }
+      ],
+      "next_cursor": null
+    }
+  }
+}

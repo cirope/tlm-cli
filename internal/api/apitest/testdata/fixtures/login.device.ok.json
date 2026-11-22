@@ -1,0 +1,20 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/login/device",
+    "body": {
+      "client_name": "tlm-cli on test-host"
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "device_code": "dc_test_device_code",
+      "expires_in": 600,
+      "interval": 5,
+      "user_code": "WDJB-MJHT",
+      "verification_uri": "http://tlm.test/login/device",
+      "verification_uri_complete": "http://tlm.test/login/device?code=WDJBMJHT"
+    }
+  }
+}

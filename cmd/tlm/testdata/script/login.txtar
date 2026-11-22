@@ -1,0 +1,45 @@
+# tlm login: the device flow. The code and URL go to stderr, the
+# device code never shows, and the token is stored (in a file here: tests
+# have no keychain).
+fake-tlm login.device.ok login.token.pending login.token.slow_down login.token.ok me.ok me.token.delete.ok
+exits 0 tlm login
+stdout '^Signed in to http://127\.0\.0\.1:\d+ as ada@example.com \(token "laptop", write access\)\.$'
+stderr '^First copy your one-time code: WDJB-MJHT$'
+stderr '^You''re in 2 organizations\. Pick one: tlm use <org>\[/<project>\]$'
+stderr '^Then open http://127\.0\.0\.1:\d+/login/device and enter it\.$'
+stderr 'No keychain found: the token is kept in .*tokens\.json, readable only by you\.'
+! stderr dc_test_device_code
+! stdout tlmp_
+! stderr tlmp_
+! exists browser.log
+grep tlmp_test_token_device config/tlm/tokens.json
+grep '"url": "http://127' config/tlm/config.json
+
+# Signed in: whoami works without TLM_URL, from the config.
+env TLM_URL=
+exits 0 tlm whoami
+stdout '^ada@example.com \(Ada Lovelace\) on http://127\.0\.0\.1:\d+$'
+stdout '^Token "laptop": write access$'
+stdout '^ORGANIZATION  NAME    ROLE$'
+stdout '^acme          Acme    admin$'
+stdout '^globex        Globex  admin$'
+! stderr .
+
+# --json prints /me as is.
+exits 0 tlm whoami --json
+stdout '"organizations": \['
+stdout '"access": "write"'
+
+# logout revokes the token and forgets it.
+exits 0 tlm logout
+stdout '^Signed out of http://127\.0\.0\.1:\d+\.$'
+! grep tlmp_test_token_device config/tlm/tokens.json
+
+exits 0 tlm logout
+stdout '^Not signed in to http://127\.0\.0\.1:\d+\.$'
+
+exits 3 tlm whoami
+stderr '^error: not signed in to http://127\.0\.0\.1:\d+\.$'
+stderr '^run: tlm login \(or set TLM_TOKEN\)$'
+! stdout .
+

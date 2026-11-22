@@ -1,0 +1,59 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/orgs/acme/audits",
+    "query": {
+      "limit": "2"
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "data": [
+        {
+          "actor": {
+            "id": "UsrAda7Kq2Xp",
+            "last_name": "Lovelace",
+            "name": "Ada"
+          },
+          "changes": {
+            "name": [
+              "Shop 2",
+              "Shop 3"
+            ]
+          },
+          "created_at": "2026-11-13T12:00:00Z",
+          "event": "update",
+          "id": "Adt9Pq4ZrCd4",
+          "item_id": "PrjShop7Kq2X",
+          "item_type": "project",
+          "origin": "user",
+          "token_name": "laptop",
+          "via": "api"
+        },
+        {
+          "actor": {
+            "id": "UsrAda7Kq2Xp",
+            "last_name": "Lovelace",
+            "name": "Ada"
+          },
+          "changes": {
+            "name": [
+              "Shop 1",
+              "Shop 2"
+            ]
+          },
+          "created_at": "2026-11-13T12:00:00Z",
+          "event": "update",
+          "id": "Adt8Mn3YqBc3",
+          "item_id": "PrjShop7Kq2X",
+          "item_type": "project",
+          "origin": "user",
+          "token_name": "laptop",
+          "via": "api"
+        }
+      ],
+      "next_cursor": "cursor_test_audits"
+    }
+  }
+}

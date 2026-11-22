@@ -1,0 +1,26 @@
+env TLM_TOKEN=tlmp_test_token_laptop
+env TLM_ORG=acme
+env TLM_PROJECT=shop
+
+# Not at a terminal, the URL is only printed.
+fake-tlm project.get.ok issue.find.ok issue.get.ok
+exits 0 tlm open
+stdout '^http://127\.0\.0\.1:\d+/projects/shop\?org=Acm7Kq2XpAb2$'
+exits 0 tlm open speed
+stdout '^http://127\.0\.0\.1:\d+/projects/shop/speed\?org=Acm7Kq2XpAb2$'
+exits 0 tlm open settings
+stdout '/projects/shop/settings\?org=Acm7Kq2XpAb2$'
+exits 0 tlm open setup
+stdout '/projects/shop/setup\?org=Acm7Kq2XpAb2$'
+! exists browser.log
+
+# An issue opens at the URL Tlm gives it.
+env TLM_ORG=
+env TLM_PROJECT=
+exits 0 tlm open issue Err7Kq2XpAb2
+stdout '^http://127\.0\.0\.1:\d+/projects/shop/issues/Err7Kq2XpAb2$'
+
+exits 2 tlm open logs
+stderr 'unknown page "logs": use issue, setup, speed, settings'
+exits 2 tlm open issue
+stderr 'missing arguments: tlm open issue <id\|url>'

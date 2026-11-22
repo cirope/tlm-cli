@@ -1,0 +1,9 @@
+# tlm test: usage mistakes exit 2.
+exits 2 tlm test
+stderr 'missing --dsn'
+exits 2 tlm test --dsn nope
+stderr 'invalid DSN'
+
+# Nothing listening: exit 1.
+exits 1 tlm test --dsn http://tlm_test@127.0.0.1:1
+stderr 'couldn''t reach Tlm'

@@ -1,0 +1,22 @@
+# Wrong usage exits 2, says what was wrong on stderr, and prints nothing
+# on stdout.
+exits 2 tlm --bogus
+stderr '^error: unknown flag: --bogus$'
+stderr '^Run tlm --help for usage\.$'
+! stdout .
+
+# No command: the usage on stderr, exit 2.
+exits 2 tlm
+stderr 'Usage:'
+! stdout .
+
+# Help, with an example, goes to stdout.
+exits 0 tlm --help
+stdout 'Usage:'
+stdout 'Examples:'
+! stderr .
+
+# The version, stamped at build time.
+exits 0 tlm --version
+stdout '^tlm dev \(commit none, built unknown\)$'
+! stderr .

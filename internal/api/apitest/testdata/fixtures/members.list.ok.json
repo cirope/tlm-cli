@@ -1,0 +1,30 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/orgs/acme/members"
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "data": [
+        {
+          "email": "ada@example.com",
+          "id": "UsrAda7Kq2Xp",
+          "last_name": "Lovelace",
+          "local_access": false,
+          "name": "Ada",
+          "role": "admin"
+        },
+        {
+          "email": "bob@example.com",
+          "id": "UsrBob8Mn3Yq",
+          "last_name": "Stone",
+          "local_access": false,
+          "name": "Bob",
+          "role": "member"
+        }
+      ],
+      "next_cursor": null
+    }
+  }
+}

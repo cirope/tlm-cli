@@ -1,0 +1,45 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/orgs/acme/projects/shop/speed"
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "device": null,
+      "dropped": 0,
+      "environment": "production",
+      "environments": [
+        "production"
+      ],
+      "period": "week",
+      "sample_rates": [
+        1.0
+      ],
+      "views": 3,
+      "vitals": {
+        "cls": {
+          "good": 1.0,
+          "needs_work": 0.0,
+          "p75": 0.05000000074505806,
+          "poor": 0.0,
+          "samples": 2
+        },
+        "inp": {
+          "good": 1.0,
+          "needs_work": 0.0,
+          "p75": 150,
+          "poor": 0.0,
+          "samples": 2
+        },
+        "lcp": {
+          "good": 0.3333333333333333,
+          "needs_work": 0.3333333333333334,
+          "p75": 5200,
+          "poor": 0.3333333333333333,
+          "samples": 3
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/login/token",
+    "body": {
+      "device_code": "dc_test_device_code"
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "token": "tlmp_test_token_device",
+      "user": {
+        "email": "ada@example.com",
+        "id": "UsrAda7Kq2Xp",
+        "last_name": "Lovelace",
+        "name": "Ada"
+      }
+    }
+  }
+}

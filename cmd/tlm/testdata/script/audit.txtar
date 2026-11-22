@@ -1,0 +1,28 @@
+env TLM_TOKEN=tlmp_test_token_laptop
+env TLM_ORG=acme
+
+# Newest first; ids whole; changes made with a token name it; the next
+# page on stderr.
+fake-tlm audits.list.ok
+exits 0 tlm audit --limit 2
+stdout '^ID            WHEN    WHO           EVENT   ITEM                  VIA          CHANGES$'
+stdout '^Adt9Pq4ZrCd4  5m ago  Ada Lovelace  update  project PrjShop7Kq2X  API: laptop  name: Shop 2 → Shop 3$'
+stdout '^Adt8Mn3YqBc3  5m ago  Ada Lovelace  update  project PrjShop7Kq2X  API: laptop  name: Shop 1 → Shop 2$'
+stderr '^More: --cursor cursor_test_audits$'
+
+exits 0 tlm audit --limit 2 --json
+stdout '"next_cursor": "cursor_test_audits"'
+stdout '"token_name": "laptop"'
+
+# Admins only.
+env TLM_TOKEN=tlmp_test_token_bob
+fake-tlm audits.list.forbidden
+exits 1 tlm audit
+stderr '^error: Your role here doesn''t allow it'
+stderr '^ask an admin of acme$'
+
+# The audit log takes no filters.
+exits 2 tlm audit --actor ada@example.com
+stderr 'unknown flag: --actor'
+exits 2 tlm audit project
+stderr 'unexpected arguments: project'

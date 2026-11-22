@@ -1,0 +1,30 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/me"
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "organizations": [
+        {
+          "name": "Acme",
+          "role": "admin",
+          "slug": "acme"
+        }
+      ],
+      "token": {
+        "access": "write",
+        "approval": "local",
+        "name": "ci",
+        "organization": "acme"
+      },
+      "user": {
+        "email": "ada@example.com",
+        "id": "UsrAda7Kq2Xp",
+        "last_name": "Lovelace",
+        "name": "Ada"
+      }
+    }
+  }
+}

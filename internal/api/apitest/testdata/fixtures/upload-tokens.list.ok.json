@@ -1,0 +1,26 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/orgs/acme/projects/shop/upload-tokens"
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "data": [
+        {
+          "created_at": "2026-11-13T12:00:00Z",
+          "created_by": {
+            "id": "UsrAda7Kq2Xp",
+            "last_name": "Lovelace",
+            "name": "Ada"
+          },
+          "hint": "test",
+          "id": "Upt7Kq2XpAb2",
+          "last_used_at": null,
+          "name": "GitHub Actions"
+        }
+      ],
+      "next_cursor": null
+    }
+  }
+}

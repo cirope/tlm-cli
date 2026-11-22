@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/orgs/acme/projects/shop/issues/Err7Kq2XpAb2/events/00000000-0000-4000-8000-000000000002"
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "environment": null,
+      "kept": false,
+      "occurred_at": "2026-11-13T12:00:00Z",
+      "payload": null,
+      "received_at": "2026-11-13T12:00:00Z",
+      "release": null,
+      "uuid": "00000000-0000-4000-8000-000000000002"
+    }
+  }
+}

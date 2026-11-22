@@ -1,0 +1,121 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/orgs/acme/projects/shop/issues/Err7Kq2XpAb2"
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "assignee": null,
+      "culprit": "Shop.Orders.get_by_token!/1",
+      "events_count": 1,
+      "first_release": "v57",
+      "first_seen_at": "2026-11-13T12:00:00Z",
+      "id": "Err7Kq2XpAb2",
+      "last_release": "v57",
+      "last_seen_at": "2026-11-13T12:00:00Z",
+      "latest_event": {
+        "environment": "prod",
+        "kept": true,
+        "occurred_at": "2026-11-13T12:00:00Z",
+        "payload": {
+          "breadcrumbs": [
+            {
+              "category": "phoenix",
+              "level": "info",
+              "message": "GET /s/k3J",
+              "timestamp": "2026-11-13T12:00:00Z"
+            },
+            {
+              "category": "ecto",
+              "level": "debug",
+              "message": "QUERY OK source=\"orders\" db=0.6ms",
+              "timestamp": "2026-11-13T12:00:00Z"
+            }
+          ],
+          "exception": {
+            "frames": [
+              {
+                "column": null,
+                "context": null,
+                "file": "lib/ecto/repo/queryable.ex",
+                "function": "one!/3",
+                "in_app": false,
+                "line": 164,
+                "module": "Ecto.Repo.Queryable"
+              },
+              {
+                "column": null,
+                "context": {
+                  "line": "    Repo.one!(from o in Order, where: o.token == ^hashed)",
+                  "post": [
+                    "  end"
+                  ],
+                  "pre": [
+                    "  def get_by_token!(token) do",
+                    "    hashed = hash(token)"
+                  ]
+                },
+                "file": "lib/shop/orders.ex",
+                "function": "get_by_token!/1",
+                "in_app": true,
+                "line": 88,
+                "module": "Shop.Orders"
+              },
+              {
+                "column": null,
+                "context": null,
+                "file": "lib/shop_web/live/order_live/show.ex",
+                "function": "mount/3",
+                "in_app": true,
+                "line": 14,
+                "module": "ShopWeb.OrderLive.Show"
+              },
+              {
+                "column": null,
+                "context": null,
+                "file": "lib/phoenix_live_view/utils.ex",
+                "function": "maybe_call_live_view_mount!/5",
+                "in_app": false,
+                "line": 348,
+                "module": "Phoenix.LiveView.Utils"
+              }
+            ],
+            "message": "expected at least one result but got none in query:\n\nfrom o0 in Shop.Order,\n  where: o0.token == ^\"k3J\"",
+            "type": "Ecto.NoResultsError"
+          },
+          "fingerprint": null,
+          "message": null,
+          "request": {
+            "headers": {
+              "accept": "text/html",
+              "user-agent": "Mozilla/5.0"
+            },
+            "method": "GET",
+            "url": "https://shop.example.com/o/k3J"
+          },
+          "request_id": null,
+          "sdk": {
+            "name": "tlm",
+            "version": "0.1.0"
+          },
+          "server": "shop@ip-10-0-1-12",
+          "session": null,
+          "tags": {
+            "node": "shop@ip-10-0-1-12"
+          }
+        },
+        "received_at": "2026-11-13T12:00:00Z",
+        "release": "v57",
+        "uuid": "00000000-0000-4000-8000-000000000001"
+      },
+      "level": "error",
+      "platform": "elixir",
+      "status": "unresolved",
+      "subtitle": "expected at least one result but got none in query:\n\nfrom o0 in Shop.Order,\n  where: o0.token == ^\"k3J\"",
+      "title": "Ecto.NoResultsError",
+      "url": "http://tlm.test/projects/shop/issues/Err7Kq2XpAb2",
+      "users_count": 1
+    }
+  }
+}

@@ -1,0 +1,90 @@
+env TLM_TOKEN=tlmp_test_token_laptop
+env TLM_ORG=acme
+env TLM_PROJECT=shop
+
+# The overview: Web Vitals at p75, then the slowest pages and requests.
+fake-tlm speed.overview.ok speed.pages.ok speed.requests.ok speed.page.ok speed.request.ok
+exits 0 tlm speed
+cmp stdout overview.txt
+stderr 'tlm speed pages'
+
+# --json is the overview's JSON as is.
+exits 0 tlm speed --json
+stdout '"environment": "production"'
+stdout '"p75": 0.05000000074505806'
+! stdout 'Slowest'
+
+exits 0 tlm speed pages
+stdout '^ROUTE      LOAD  VIEWS  LCP     NAV  INP$'
+stdout '^/checkout  hard  1      5\.20 s  —    —$'
+stdout '^/          hard  2      2\.60 s  —    150 ms$'
+! stderr 'More:'
+exits 0 tlm speed pages --json
+stdout '"route": "/checkout"'
+stdout '"next_cursor": null'
+
+exits 0 tlm speed requests
+stdout '^METHOD  ROUTE      CALLS  FAILED  P75     START$'
+stdout '^GET     /api/cart  3      33%     2\.10 s  120 ms$'
+exits 0 tlm speed requests --json
+stdout '"failed": 0\.3333333333333333'
+
+# The drill-downs: the route goes as a query value.
+exits 0 tlm speed page /checkout
+stdout '^/checkout · 1 page view$'
+stdout '^LCP    5\.20 s  0%    0%          100%  1$'
+stdout '^TTFB   —       —     —           —     0$'
+stdout '^desktop  1      100%   5\.20 s  —$'
+stdout '^5m ago  desktop  Firefox  AR       6c5717a  5\.20 s  —    session-0003  pageview-0003$'
+exits 0 tlm speed page /checkout --json
+stdout '"slow_visits": \['
+
+exits 0 tlm speed request get /api/cart
+stdout '^GET /api/cart$'
+stdout '^PAGE       CALLS  FAILED  P75     START   PAGE LCP  PAGE NAV$'
+stdout '^/checkout  1      100%    2\.10 s  120 ms  5\.20 s    —$'
+stdout '^5m ago  /checkout  500     2\.10 s    desktop  Firefox  AR       session-0003  pageview-0003$'
+exits 0 tlm speed request GET /api/cart --json
+stdout '"slow_calls": \['
+
+# A value Tlm doesn't take: its 400 says which it does.
+fake-tlm speed.overview.invalid
+exits 2 tlm speed --period year
+stderr 'period must be one of: day, week, month, quarter'
+
+# Tlm without ClickHouse keeps no speed data.
+fake-tlm speed.overview.no_clickhouse
+exits 1 tlm speed
+stderr '^error: this Tlm doesn''t keep speed data, or the project doesn''t exist'
+
+# ClickHouse not answering: Tlm says so, and it's worth trying again.
+fake-tlm speed.overview.unavailable
+exits 1 tlm speed
+stderr '^error: Speed data is unavailable right now'
+
+# Usage mistakes.
+exits 2 tlm speed fast
+stderr 'unknown action "fast" for speed'
+exits 2 tlm speed page
+stderr 'missing arguments: tlm speed page <route>'
+exits 2 tlm speed request GET
+stderr 'missing arguments'
+exits 2 tlm speed pages --limit 500
+stderr '--limit must be 1 to 100'
+
+-- overview.txt --
+production · last week · all devices · 3 page views
+
+VITAL  P75     GOOD  NEEDS WORK  POOR  SAMPLES
+LCP    5.20 s  33%   33%         33%   3
+INP    150 ms  100%  0%          0%    2
+CLS    0.05    100%  0%          0%    2
+
+Slowest pages
+ROUTE      LOAD  VIEWS  LCP     NAV  INP
+/checkout  hard  1      5.20 s  —    —
+/          hard  2      2.60 s  —    150 ms
+
+Slowest requests
+METHOD  ROUTE      CALLS  FAILED  P75     START
+GET     /api/cart  3      33%     2.10 s  120 ms

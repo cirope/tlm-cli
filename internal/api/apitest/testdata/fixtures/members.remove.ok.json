@@ -1,0 +1,10 @@
+{
+  "request": {
+    "method": "DELETE",
+    "path": "/api/v1/orgs/acme/members/UsrBob8Mn3Yq"
+  },
+  "response": {
+    "status": 204,
+    "body": ""
+  }
+}

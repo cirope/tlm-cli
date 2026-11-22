@@ -1,0 +1,25 @@
+{
+  "request": {
+    "method": "PATCH",
+    "path": "/api/v1/orgs/acme/projects/shop",
+    "body": {
+      "name": "Storefront"
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "created_at": "2026-11-13T12:00:00Z",
+      "dsn": "http://tlm_test_key_shop@tlm.test",
+      "id": "PrjShop7Kq2X",
+      "muted": false,
+      "name": "Storefront",
+      "platforms": [
+        "elixir"
+      ],
+      "slug": "shop",
+      "unresolved_count": 1,
+      "url": "http://tlm.test/projects/shop?org=Acm7Kq2XpAb2"
+    }
+  }
+}

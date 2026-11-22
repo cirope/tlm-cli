@@ -1,0 +1,23 @@
+{
+  "request": {
+    "method": "PATCH",
+    "path": "/api/v1/orgs/acme/members/UsrBob8Mn3Yq",
+    "body": {
+      "role": "boss"
+    }
+  },
+  "response": {
+    "status": 422,
+    "body": {
+      "error": {
+        "code": "invalid",
+        "fields": {
+          "role": [
+            "is invalid"
+          ]
+        },
+        "message": "Some values aren't valid."
+      }
+    }
+  }
+}

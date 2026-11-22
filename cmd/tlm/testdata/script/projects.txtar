@@ -1,0 +1,56 @@
+env TLM_TOKEN=tlmp_test_token_laptop
+
+# Two organizations: which one must be said, and the error lists them.
+fake-tlm me.ok projects.list.ok
+exits 2 tlm projects list
+stderr '^error: you''re in 2 organizations; pass --org acme \(or globex\)$'
+stderr '^or set a default for this Tlm: tlm use <org>\[/<project>\]$'
+stderr '^Run tlm --help for usage\.$'
+
+exits 0 tlm projects list --org acme
+cmp stdout list.txt
+! stderr .
+
+exits 0 tlm projects list --org acme --json
+stdout '"slug": "api"'
+stdout '"next_cursor": null'
+
+# One page with a More hint on stderr.
+fake-tlm projects.list.next_page
+exits 0 tlm projects list --org acme --limit 1 --cursor cursor_test_next
+stdout '^shop  Shop'
+
+# show and dsn, with the project named or implied.
+env TLM_ORG=acme
+fake-tlm project.get.ok
+exits 0 tlm projects show shop
+stdout '^Shop \(shop\)$'
+stdout '^http://127\.0\.0\.1:\d+/projects/shop\?org=Acm7Kq2XpAb2$'
+stdout '^DSN: http://tlm_test_key_shop@tlm\.test$'
+
+exits 0 tlm dsn shop
+stdout '^http://tlm_test_key_shop@tlm\.test$'
+
+fake-tlm project.get.not_found
+exits 1 tlm projects show nope
+stderr '^error: That doesn''t exist, or this token can''t see it\.$'
+
+# create prints the DSN; 422 lists the fields and exits 1; a read-only
+# token exits 3 with a hint.
+fake-tlm projects.create.ok projects.create.invalid
+exits 0 tlm projects create Docs
+stdout '^Docs \(docs\)$'
+stdout '^DSN: http://tlm_test_key_docs@'
+exits 1 tlm projects create ''
+stderr '^error: Some values aren''t valid\.$'
+stderr '^  name: can''t be blank$'
+
+fake-tlm projects.create.read_only
+exits 3 tlm projects create Docs
+stderr '^error: This token is read-only\.$'
+stderr 'this token is read-only; create one with write access'
+
+-- list.txt --
+SLUG  NAME  PLATFORMS  UNRESOLVED  CREATED
+api   API              0           5m ago
+shop  Shop  elixir     1           5m ago

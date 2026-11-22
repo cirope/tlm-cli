@@ -1,0 +1,38 @@
+# Read-only commands against a real Tlm.
+exits 0 tlm whoami
+stdout 'Token "'
+
+exits 0 tlm whoami --json
+stdout '"organizations"'
+
+exits 0 tlm projects list
+stdout '^SLUG'
+
+exits 0 tlm projects show
+stdout '^DSN: '
+
+exits 0 tlm dsn
+
+exits 0 tlm issues list --limit 5
+exits 0 tlm issues list --limit 5 --json
+stdout '"data"'
+
+exits 0 tlm members list
+stdout '^EMAIL'
+
+exits 0 tlm origins list
+
+exits 0 tlm signals
+
+# Speed: 0 where Tlm keeps page views, 1 where it doesn't.
+exec sh -c 'tlm speed >/dev/null 2>&1; test $? -le 1'
+
+# A dry-run upload sends nothing.
+exits 0 tlm upload dist --release live-test --dry-run
+stdout 'dry run: nothing sent'
+
+-- dist/app.js --
+console.log(1);
+//# sourceMappingURL=app.js.map
+-- dist/app.js.map --
+{"version":3,"file":"app.js","sources":["app.ts"],"sourcesContent":["console.log(1)"],"names":[],"mappings":"AAAA"}

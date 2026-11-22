@@ -1,0 +1,48 @@
+env TLM_TOKEN=tlmp_test_token_laptop
+env TLM_ORG=acme
+
+fake-tlm members.list.ok
+exits 0 tlm members list
+stdout '^EMAIL            NAME          ROLE    WITHOUT SSO$'
+stdout '^ada@example\.com  Ada Lovelace  admin   no$'
+stdout '^bob@example\.com  Bob Stone     member  no$'
+
+# An email is resolved to the member's id through the list.
+fake-tlm members.list.ok members.update.ok members.update.forbidden members.remove.ok members.remove.self
+exits 0 tlm members role bob@example.com admin
+stdout '^bob@example\.com is now admin in acme\.$'
+
+exits 1 tlm members role ada@example.com member
+stderr '^error: Your role here doesn''t allow it\.$'
+
+exits 2 tlm members role bob@example.com owner
+stderr 'unknown role "owner": use member or admin'
+
+exits 1 tlm members role nobody@example.com admin
+stderr 'nobody@example\.com isn''t a member of acme'
+
+# Destructive: refused without a terminal to ask at, unless --yes.
+exits 2 tlm members remove bob@example.com
+stderr 'pass --yes'
+exits 0 tlm members remove bob@example.com --yes
+stdout '^Removed bob@example\.com from acme\.$'
+
+exits 1 tlm members remove ada@example.com -y
+stderr '^error: You cannot remove yourself\.$'
+
+# People are added in the web app.
+exits 2 tlm members invite new@example.com
+stderr 'unknown action "invite"'
+exits 2 tlm members leave
+stderr 'unknown action "leave"'
+
+# tlm api: the raw JSON, as is.
+fake-tlm me.ok
+exits 0 tlm api /me
+stdout '"email": "ada@example.com"'
+exits 0 tlm api api/v1/me
+stdout '"organizations"'
+exits 2 tlm api /me -X TRACE
+stderr 'unknown method'
+exits 2 tlm api '/me?x=1'
+stderr 'with -f key=value'

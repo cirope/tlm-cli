@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/orgs/acme/projects/shop/upload-tokens"
+  },
+  "response": {
+    "status": 403,
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "Your role here doesn't allow it."
+      }
+    }
+  }
+}

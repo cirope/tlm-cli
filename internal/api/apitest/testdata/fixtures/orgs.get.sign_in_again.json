@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/orgs/acme"
+  },
+  "response": {
+    "status": 403,
+    "body": {
+      "error": {
+        "code": "sign_in_again",
+        "message": "This organization asks for a new sign-in before this token can open it. Run tlm login again."
+      }
+    }
+  }
+}

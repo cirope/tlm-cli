@@ -1,0 +1,19 @@
+# No token in any output, even with --verbose, success or failure.
+env TLM_TOKEN=tlmp_test_token_laptop
+env TLM_ORG=acme
+env TLM_PROJECT=shop
+fake-tlm me.ok project.get.ok me.unauthorized
+exits 0 tlm whoami -v
+! stdout tlmp_test_token_laptop
+! stderr tlmp_test_token_laptop
+stderr 'level=DEBUG msg=request method=GET path=/api/v1/me status=200'
+
+exits 0 tlm projects show -v --json
+! stdout tlmp_test_token_laptop
+! stderr tlmp_test_token_laptop
+
+env TLM_DEBUG=1
+exits 1 tlm upload-tokens list
+! stdout tlmp_test_token_laptop
+! stderr tlmp_test_token_laptop
+stderr 'level=DEBUG'

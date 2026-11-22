@@ -1,0 +1,24 @@
+{
+  "request": {
+    "method": "PUT",
+    "path": "/api/v1/orgs/acme/projects/shop/origins",
+    "body": {
+      "origin": "shop.example.com",
+      "status": "allowed"
+    }
+  },
+  "response": {
+    "status": 422,
+    "body": {
+      "error": {
+        "code": "invalid",
+        "fields": {
+          "origin": [
+            "must be a scheme and a host, like https://shop.example.com"
+          ]
+        },
+        "message": "Some values aren't valid."
+      }
+    }
+  }
+}

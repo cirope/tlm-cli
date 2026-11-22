@@ -1,0 +1,50 @@
+env TLM_ORG=acme
+env TLM_PROJECT=shop
+
+# A dry run needs no credentials and sends nothing.
+exits 0 tlm upload dist --release web@1.4.2 --dry-run
+stdout '^would upload /assets/index-a1b2c3d4\.js$'
+stdout '^1 map\(s\) for release web@1\.4\.2 to https://tlm\.hullop\.com \(dry run: nothing sent\)$'
+
+# Only an upload token uploads: a personal token isn't enough.
+env TLM_TOKEN=tlmp_test_token_laptop
+exits 2 tlm upload dist --release web@1.4.2
+stderr 'missing TLM_UPLOAD_TOKEN'
+! stderr tlmp_test
+
+exits 2 tlm upload dist
+stderr 'missing --release'
+exits 2 tlm upload
+stderr 'missing the directory to upload'
+
+# The token from the environment, Tlm from the DSN.
+env TLM_UPLOAD_TOKEN=tlmu_test_upload_ci
+fake-tlm sourcemaps.upload.ok
+exits 0 tlm upload dist --release web@1.4.2 --dsn $DSN
+stdout '^Uploaded 1 map\(s\) for release web@1\.4\.2\.$'
+exists dist/assets/index-a1b2c3d4.js.map
+
+# A refused token exits 1 here, not 3: upload uses only 0, 1 and 2.
+fake-tlm sourcemaps.upload.bad_token
+env TLM_DSN=$DSN
+exits 1 tlm upload dist --release web@1.4.2
+stderr 'TLM_UPLOAD_TOKEN'
+! stderr tlmu_test
+
+# --delete removes the maps after a successful upload.
+fake-tlm sourcemaps.upload.ok
+env TLM_DSN=$DSN
+exits 0 tlm upload dist --release web@1.4.2 --delete
+stdout 'Deleted the \.map files\.'
+! exists dist/assets/index-a1b2c3d4.js.map
+! grep sourceMappingURL dist/assets/index-a1b2c3d4.js
+
+# No maps: exit 1 with how to turn them on.
+exits 1 tlm upload dist --release web@1.4.2
+stderr 'no source maps found in dist'
+
+-- dist/assets/index-a1b2c3d4.js --
+console.log("hi");
+//# sourceMappingURL=index-a1b2c3d4.js.map
+-- dist/assets/index-a1b2c3d4.js.map --
+{"version":3,"file":"index-a1b2c3d4.js","sources":["../src/main.ts"],"sourcesContent":["console.log(\"hi\")"],"names":[],"mappings":"AAAA"}

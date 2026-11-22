@@ -1,0 +1,10 @@
+{
+  "request": {
+    "method": "DELETE",
+    "path": "/api/v1/me/token"
+  },
+  "response": {
+    "status": 204,
+    "body": ""
+  }
+}

@@ -1,0 +1,42 @@
+env TLM_TOKEN=tlmp_test_token_laptop
+
+fake-tlm orgs.list.ok orgs.get.ok orgs.update.ok orgs.update.invalid
+exits 0 tlm orgs list
+stdout '^SLUG    NAME    ROLE   CREATED$'
+stdout '^acme    Acme    admin  5m ago$'
+stdout '^globex  Globex  admin  5m ago$'
+
+exits 0 tlm orgs show acme
+stdout '^Acme \(acme\)$'
+stdout '^Your role: admin$'
+
+exits 0 tlm orgs edit acme --name 'Acme Labs'
+stdout '^Acme Labs \(acme\)$'
+
+exits 1 tlm orgs edit acme --name ''
+stderr '^error: Some values aren''t valid\.$'
+stderr '^  name: can''t be blank$'
+
+# Only the name changes: the slug is fixed.
+exits 2 tlm orgs edit acme
+stderr 'say the new name with --name'
+exits 2 tlm orgs edit acme --slug acme-labs
+stderr 'unknown flag: --slug'
+
+# Admins only.
+env TLM_TOKEN=tlmp_test_token_bob
+fake-tlm orgs.update.forbidden
+exits 1 tlm orgs edit acme --name 'Acme Inc'
+stderr '^error: Your role here doesn''t allow it\.$'
+stderr '^ask an admin of acme$'
+
+# Not found reads like not visible.
+fake-tlm orgs.get.not_found
+exits 1 tlm orgs show nope
+stderr '^error: That doesn''t exist, or this token can''t see it\.$'
+
+# An organization behind single sign-on asks for a new sign-in: exit 3.
+fake-tlm orgs.get.sign_in_again
+exits 3 tlm orgs show acme
+stderr '^error: This organization asks for a new sign-in before this token can open it\. Run tlm login again\.$'
+stderr '^run: tlm login$'

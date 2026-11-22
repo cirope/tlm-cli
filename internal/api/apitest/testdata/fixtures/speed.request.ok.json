@@ -1,0 +1,72 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/orgs/acme/projects/shop/speed/request",
+    "query": {
+      "method": "GET",
+      "route": "/api/cart"
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "method": "GET",
+      "pages": [
+        {
+          "calls": 1,
+          "failed": 1.0,
+          "lcp": 5200,
+          "nav": null,
+          "p75": 2100,
+          "route": "/checkout",
+          "start": 120
+        },
+        {
+          "calls": 2,
+          "failed": 0.0,
+          "lcp": 2600,
+          "nav": null,
+          "p75": 340,
+          "route": "/",
+          "start": 120
+        }
+      ],
+      "route": "/api/cart",
+      "slow_calls": [
+        {
+          "at": "2026-11-13T12:00:00Z",
+          "browser": "Firefox",
+          "country": "AR",
+          "device": "desktop",
+          "duration": 2100,
+          "id": "pageview-0003",
+          "page": "/checkout",
+          "session": "session-0003",
+          "status": 500
+        },
+        {
+          "at": "2026-11-13T12:00:00Z",
+          "browser": "Firefox",
+          "country": "AR",
+          "device": "desktop",
+          "duration": 340,
+          "id": "pageview-0002",
+          "page": "/",
+          "session": "session-0002",
+          "status": 200
+        },
+        {
+          "at": "2026-11-13T12:00:00Z",
+          "browser": "Firefox",
+          "country": "AR",
+          "device": "phone",
+          "duration": 340,
+          "id": "pageview-0001",
+          "page": "/",
+          "session": "session-0001",
+          "status": 200
+        }
+      ]
+    }
+  }
+}

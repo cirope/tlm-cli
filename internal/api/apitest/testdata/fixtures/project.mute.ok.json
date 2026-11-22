@@ -1,0 +1,10 @@
+{
+  "request": {
+    "method": "PUT",
+    "path": "/api/v1/orgs/acme/projects/shop/mute"
+  },
+  "response": {
+    "status": 204,
+    "body": ""
+  }
+}

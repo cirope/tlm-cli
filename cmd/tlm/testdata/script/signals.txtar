@@ -1,0 +1,23 @@
+env TLM_TOKEN=tlmp_test_token_laptop
+env TLM_ORG=acme
+env TLM_PROJECT=shop
+
+# One row per environment and source.
+fake-tlm signals.list.ok
+exits 0 tlm signals
+stdout '^ENVIRONMENT  SOURCE   STATUS  LAST SEEN  SDK                RELEASE    SERVER  RUNTIME$'
+stdout '^prod         server   active  5m ago     tlm 0\.1\.0          v57$'
+stdout '^production   server   active  5m ago     tlm 0\.1\.0          v57        web-1   elixir 1\.19\.4, otp 28$'
+stdout '^production   browser  active  5m ago     @hullop/tlm 0\.1\.0  web@1\.4\.2$'
+
+# The project as an argument.
+env TLM_PROJECT=
+exits 0 tlm signals shop
+stdout '^production   browser'
+
+exits 0 tlm signals shop --json
+stdout '"heartbeat_at": null'
+stdout '"next_cursor": null'
+
+exits 2 tlm signals shop other
+stderr 'unexpected arguments: other'

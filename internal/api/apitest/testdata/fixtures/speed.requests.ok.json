@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/orgs/acme/projects/shop/speed/requests"
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "data": [
+        {
+          "calls": 3,
+          "failed": 0.3333333333333333,
+          "method": "GET",
+          "p75": 2100,
+          "route": "/api/cart",
+          "start": 120
+        }
+      ],
+      "next_cursor": null
+    }
+  }
+}

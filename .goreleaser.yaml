@@ -1,0 +1,78 @@
+# Releases (run by .github/workflows/release.yml when a v* tag is pushed).
+# Check locally with: make release-check (and make release-snapshot).
+version: 2
+
+project_name: tlm
+
+before:
+  hooks:
+    - go mod tidy -diff
+
+builds:
+  - id: tlm
+    main: ./cmd/tlm
+    binary: tlm
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.Date}}
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    goos: [darwin, linux, windows]
+    goarch: [amd64, arm64]
+
+archives:
+  - id: tlm
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    # Stable names, so releases/latest/download/<name> always works.
+    name_template: "tlm_{{ .Os }}_{{ .Arch }}"
+    files:
+      - README.md
+      - CHANGELOG.md
+
+checksum:
+  name_template: checksums.txt
+
+nfpms:
+  - id: tlm
+    package_name: tlm
+    vendor: Hullop
+    homepage: https://github.com/cirope/tlm-cli
+    maintainer: Hullop <dev@hullop.com>
+    description: "Manage Tlm from the terminal: issues, speed, projects and source maps."
+    license: MIT
+    formats: [deb, rpm, apk]
+    file_name_template: "tlm_{{ .Os }}_{{ .Arch }}{{ .ConventionalExtension }}"
+    bindir: /usr/bin
+
+homebrew_casks:
+  - name: tlm
+    repository:
+      owner: cirope
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    homepage: https://github.com/cirope/tlm-cli
+    description: "Manage Tlm from the terminal: issues, speed, projects and source maps"
+    commit_author:
+      name: hullop-bot
+      email: dev@hullop.com
+    hooks:
+      post:
+        # Release binaries are not notarized; let macOS run them.
+        install_steps: |
+          on_macos do
+            run "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "{{ .StagedPath }}/tlm"]
+          end
+
+changelog:
+  # Release notes come from CHANGELOG.md, written for the people who use tlm.
+  disable: true
+
+release:
+  github:
+    owner: cirope
+    name: tlm-cli

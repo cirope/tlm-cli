@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/orgs/acme/projects/shop/speed"
+  },
+  "response": {
+    "status": 503,
+    "body": {
+      "error": {
+        "code": "unavailable",
+        "message": "Speed data is unavailable right now. Try again in a moment."
+      }
+    }
+  }
+}

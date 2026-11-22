@@ -1,0 +1,15 @@
+env TLM_TOKEN=tlmp_test_token_laptop
+env TLM_ORG=acme
+env TLM_PROJECT=shop
+
+fake-tlm origins.list.ok origins.allow.ok origins.block.ok origins.forget.ok
+exits 0 tlm origins list
+stdout '^https://shop\.example\.com  pending  5m ago$'
+
+# A bare host means https://.
+exits 0 tlm origins allow shop.example.com
+stdout '^https://shop\.example\.com: allowed$'
+exits 0 tlm origins block https://shop.example.com
+stdout ': blocked$'
+exits 0 tlm origins forget shop.example.com
+stdout '^Forgot https://shop\.example\.com; its next event will ask again\.$'

@@ -1,0 +1,53 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/orgs/acme/projects/shop/signals"
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "data": [
+        {
+          "environment": "prod",
+          "heartbeat_at": null,
+          "last_seen_at": "2026-11-13T12:00:00Z",
+          "release": "v57",
+          "runtime": null,
+          "sdk_name": "tlm",
+          "sdk_version": "0.1.0",
+          "server": null,
+          "source": "server",
+          "status": "active"
+        },
+        {
+          "environment": "production",
+          "heartbeat_at": null,
+          "last_seen_at": "2026-11-13T12:00:00Z",
+          "release": "v57",
+          "runtime": {
+            "elixir": "1.19.4",
+            "otp": "28"
+          },
+          "sdk_name": "tlm",
+          "sdk_version": "0.1.0",
+          "server": "web-1",
+          "source": "server",
+          "status": "active"
+        },
+        {
+          "environment": "production",
+          "heartbeat_at": null,
+          "last_seen_at": "2026-11-13T12:00:00Z",
+          "release": "web@1.4.2",
+          "runtime": null,
+          "sdk_name": "@hullop/tlm",
+          "sdk_version": "0.1.0",
+          "server": null,
+          "source": "browser",
+          "status": "active"
+        }
+      ],
+      "next_cursor": null
+    }
+  }
+}

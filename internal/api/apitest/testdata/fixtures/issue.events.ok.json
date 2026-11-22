@@ -1,0 +1,30 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/orgs/acme/projects/shop/issues/Err7Kq2XpAb2/events"
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "data": [
+        {
+          "environment": "prod",
+          "kept": true,
+          "occurred_at": "2026-11-13T12:00:00Z",
+          "received_at": "2026-11-13T12:00:00Z",
+          "release": "v57",
+          "uuid": "00000000-0000-4000-8000-000000000002"
+        },
+        {
+          "environment": "prod",
+          "kept": true,
+          "occurred_at": "2026-11-13T12:00:00Z",
+          "received_at": "2026-11-13T12:00:00Z",
+          "release": "v57",
+          "uuid": "00000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "next_cursor": null
+    }
+  }
+}

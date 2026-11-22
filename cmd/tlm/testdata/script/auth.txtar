@@ -1,0 +1,41 @@
+# TLM_TOKEN wins, and whoami says so.
+fake-tlm me.narrowed
+env TLM_TOKEN=tlmp_test_token_narrowed
+exits 0 tlm whoami
+stdout '^Token "ci" from TLM_TOKEN: write access, only acme$'
+
+# logout with TLM_TOKEN set is a usage error, and calls nothing.
+exits 2 tlm logout
+stderr 'TLM_TOKEN is set'
+
+# A rejected token exits 3 with Tlm's message and the login hint.
+fake-tlm me.unauthorized
+env TLM_TOKEN=tlmp_test_revoked
+exits 3 tlm whoami
+stderr '^error: This token is unknown, was revoked or expired\. Sign in again\.$'
+stderr '^run: tlm login$'
+! stderr tlmp_test_revoked
+
+# Under --json, the error is one JSON object on stderr.
+exits 3 tlm whoami --json
+stderr '^\{"error":\{"code":"unauthorized","message":"This token is unknown'
+! stdout .
+
+# --lang must be en or es.
+exits 2 tlm whoami --lang fr
+stderr 'unknown language "fr": use en or es'
+
+# A flag the command doesn't take is a usage error.
+exits 2 tlm whoami --markdown
+stderr 'unknown flag: --markdown'
+
+# A bad --url is a usage error.
+exits 2 tlm whoami --url ftp://x
+stderr 'invalid Tlm URL'
+
+# A token idle for 90 days, or revoked in the settings page, is refused the same way.
+fake-tlm me.token.idle me.token.revoked
+exits 3 tlm whoami
+stderr '^run: tlm login$'
+exits 3 tlm whoami
+stderr '^run: tlm login$'

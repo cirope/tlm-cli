@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/sourcemaps",
+    "multipart": [
+      {
+        "content": "web@1.4.2",
+        "name": "release"
+      }
+    ]
+  },
+  "response": {
+    "status": 400,
+    "body": {
+      "error": "manifest is required"
+    }
+  }
+}

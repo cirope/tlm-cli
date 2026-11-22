@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "PATCH",
+    "path": "/api/v1/orgs/acme",
+    "body": {
+      "name": "Acme Labs"
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "created_at": "2026-11-13T12:00:00Z",
+      "name": "Acme Labs",
+      "role": "admin",
+      "slug": "acme"
+    }
+  }
+}

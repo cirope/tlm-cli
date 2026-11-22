@@ -1,0 +1,32 @@
+# tlm use: a default organization and project for this Tlm.
+env TLM_TOKEN=tlmp_test_token_laptop
+fake-tlm project.get.ok orgs.get.ok me.ok issues.list.empty
+
+exits 0 tlm use
+stdout '^No default on http://127\.0\.0\.1:\d+\.$'
+stderr 'tlm use <org>\[/<project>\]'
+
+# It's checked against Tlm, then stored.
+exits 0 tlm use acme/shop
+stdout '^Commands on http://127\.0\.0\.1:\d+ now use acme/shop\.$'
+grep '"project": "shop"' config/tlm/config.json
+
+exits 0 tlm use
+stdout '^acme/shop$'
+
+# Two organizations, yet nothing to say: the default answers.
+exits 0 tlm issues list nothing matches this
+stdout 'No unresolved issues'
+
+exits 0 tlm whoami
+stdout '^Default: acme/shop$'
+
+exits 0 tlm use acme
+stdout 'now use acme\.$'
+
+exits 2 tlm use acme/shop/x
+stderr 'expected <org> or <org>/<project>'
+
+exits 0 tlm use --clear
+stdout '^No default on'
+! grep acme config/tlm/config.json

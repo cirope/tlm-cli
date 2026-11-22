@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "PATCH",
+    "path": "/api/v1/orgs/acme",
+    "body": {
+      "name": "Acme Inc"
+    }
+  },
+  "response": {
+    "status": 403,
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "Your role here doesn't allow it."
+      }
+    }
+  }
+}

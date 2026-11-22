@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/orgs/acme/projects/shop/issues/Mrg9Pq4ZrCd4"
+  },
+  "response": {
+    "status": 308,
+    "headers": {
+      "Location": "/api/v1/orgs/acme/projects/shop/issues/Err7Kq2XpAb2"
+    },
+    "body": ""
+  }
+}

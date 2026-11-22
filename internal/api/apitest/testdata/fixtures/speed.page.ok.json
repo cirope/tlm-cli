@@ -1,0 +1,77 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/orgs/acme/projects/shop/speed/page",
+    "query": {
+      "route": "/checkout"
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "devices": [
+        {
+          "lcp": 5200,
+          "lcp_samples": 1,
+          "nav": null,
+          "nav_samples": 0,
+          "share": 1.0,
+          "value": "desktop",
+          "views": 1
+        }
+      ],
+      "route": "/checkout",
+      "slow_visits": [
+        {
+          "at": "2026-11-13T12:00:00Z",
+          "browser": "Firefox",
+          "country": "AR",
+          "device": "desktop",
+          "id": "pageview-0003",
+          "lcp": 5200,
+          "nav": null,
+          "release": "6c5717a",
+          "session": "session-0003"
+        }
+      ],
+      "views": 1,
+      "vitals": {
+        "cls": {
+          "good": 0.0,
+          "needs_work": 0.0,
+          "p75": null,
+          "poor": 0.0,
+          "samples": 0
+        },
+        "inp": {
+          "good": 0.0,
+          "needs_work": 0.0,
+          "p75": null,
+          "poor": 0.0,
+          "samples": 0
+        },
+        "lcp": {
+          "good": 0.0,
+          "needs_work": 0.0,
+          "p75": 5200,
+          "poor": 1.0,
+          "samples": 1
+        },
+        "nav": {
+          "good": 0.0,
+          "needs_work": 0.0,
+          "p75": null,
+          "poor": 0.0,
+          "samples": 0
+        },
+        "ttfb": {
+          "good": 0.0,
+          "needs_work": 0.0,
+          "p75": null,
+          "poor": 0.0,
+          "samples": 0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,25 @@
+env TLM_TOKEN=tlmp_test_token_laptop
+env TLM_ORG=acme
+env TLM_PROJECT=shop
+
+fake-tlm upload-tokens.list.ok upload-tokens.create.ok upload-tokens.revoke.ok
+exits 0 tlm upload-tokens list
+stdout '^ID            NAME            TOKEN       LAST USED  CREATED BY    CREATED$'
+stdout '^Upt7Kq2XpAb2  GitHub Actions  tlmu_…test'
+
+# The secret alone on stdout, for a pipe; the rest on stderr.
+exits 0 tlm upload-tokens create 'GitHub Actions'
+stdout '^tlmu_test_upload_ci$'
+stderr '^Upload token "GitHub Actions" \(Upt7Kq2XpAb2\):$'
+stderr 'only time it''s shown\. Store it as TLM_UPLOAD_TOKEN'
+
+exits 0 tlm upload-tokens create 'GitHub Actions' --json
+stdout '"secret": "tlmu_test_upload_ci"'
+
+exits 0 tlm upload-tokens revoke Upt7Kq2XpAb2
+stdout '^Revoked\.$'
+
+# Admins only.
+fake-tlm upload-tokens.list.forbidden
+exits 1 tlm upload-tokens list
+stderr '^ask an admin of acme$'

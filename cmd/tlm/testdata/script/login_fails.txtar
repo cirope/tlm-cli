@@ -1,0 +1,10 @@
+# A denied or expired login exits 3 and stores nothing.
+fake-tlm login.device.ok login.token.denied
+exits 3 tlm login
+stderr '^error: the login was denied in the browser$'
+! exists config/tlm/tokens.json
+
+fake-tlm login.device.ok login.token.pending login.token.expired
+exits 3 tlm login
+stderr 'error: the code expired before it was approved; run tlm login again'
+! exists config/tlm/tokens.json

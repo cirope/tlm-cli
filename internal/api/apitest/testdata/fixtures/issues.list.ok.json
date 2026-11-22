@@ -1,0 +1,35 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/orgs/acme/projects/shop/issues",
+    "query": {
+      "limit": "1"
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "data": [
+        {
+          "assignee": null,
+          "culprit": null,
+          "events_count": 1,
+          "events_in_range": 1,
+          "first_release": "web@1.4.2",
+          "first_seen_at": "2026-11-13T12:00:00Z",
+          "id": "Err8Mn3YqBc3",
+          "last_release": "web@1.4.2",
+          "last_seen_at": "2026-11-13T12:00:00Z",
+          "level": "error",
+          "platform": "javascript",
+          "status": "unresolved",
+          "subtitle": "x is not a function",
+          "title": "TypeError",
+          "url": "http://tlm.test/projects/shop/issues/Err8Mn3YqBc3",
+          "users_count": 1
+        }
+      ],
+      "next_cursor": "cursor_test_issues"
+    }
+  }
+}

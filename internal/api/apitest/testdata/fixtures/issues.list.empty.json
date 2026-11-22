@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/orgs/acme/projects/shop/issues",
+    "query": {
+      "q": "nothing matches this"
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "data": [],
+      "next_cursor": null
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/orgs/acme/projects",
+    "body": {
+      "name": "Docs"
+    }
+  },
+  "response": {
+    "status": 403,
+    "body": {
+      "error": {
+        "code": "read_only",
+        "message": "This token is read-only."
+      }
+    }
+  }
+}

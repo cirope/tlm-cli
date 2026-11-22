@@ -1,0 +1,27 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/sourcemaps",
+    "multipart": [
+      {
+        "content": "web@1.4.2",
+        "name": "release"
+      },
+      {
+        "content": "[{\"map\":\"index-a1b2c3d4.js.map\",\"path\":\"/assets/index-a1b2c3d4.js\"}]",
+        "name": "manifest"
+      },
+      {
+        "content_type": "application/gzip",
+        "filename": "index-a1b2c3d4.js.map",
+        "name": "index-a1b2c3d4.js.map"
+      }
+    ]
+  },
+  "response": {
+    "status": 401,
+    "body": {
+      "error": "invalid token"
+    }
+  }
+}

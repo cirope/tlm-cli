@@ -2,7 +2,7 @@
 
 What changed in each release of `tlm`, for the people who use it.
 
-## Unreleased
+## 0.1.0
 
 The first release of the Tlm CLI: one binary, for macOS, Linux and
 Windows.

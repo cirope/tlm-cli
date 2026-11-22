@@ -1,4 +1,8 @@
 # Read-only commands against a real Tlm.
+exits 0 tlm guide
+stdout '^# '
+stdout 'tlm login'
+
 exits 0 tlm whoami
 stdout 'Token "'
 

@@ -2,6 +2,12 @@
 
 What changed in each release of `tlm`, for the people who use it.
 
+## Unreleased
+
+- `tlm guide` prints Tlm's step-by-step guide for AI agents to add Tlm
+  to an app, without signing in. `tlm --help`, `login` and
+  `projects create` point to it.
+
 ## 0.1.0
 
 The first release of the Tlm CLI: one binary, for macOS, Linux and

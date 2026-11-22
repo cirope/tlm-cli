@@ -229,4 +229,5 @@ func (a *app) nextSteps(me *api.Me) {
 	default:
 		a.progress("You're in %d organizations. Pick one: tlm use <org>[/<project>]", len(orgs))
 	}
+	a.progress("Adding Tlm to an app? tlm guide says how, step by step.")
 }

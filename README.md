@@ -166,6 +166,18 @@ tlm signals                     # when each environment's servers and browsers w
 
 ## Using it with an agent
 
+To add Tlm to an app, hand the agent Tlm's guide: install and sign in,
+pick the project, add Tlm in the app's language (package, settings, speed,
+source maps in CI), then check it worked. It needs no sign-in and holds
+nothing secret; `--lang es` asks for it in Spanish.
+
+```sh
+tlm guide > TLM.md
+claude "Add Tlm to this app: follow TLM.md"
+```
+
+Once it reports:
+
 ```sh
 tlm issues list --env production --json
 tlm issues show 2C7ZffP787kc --markdown > issue.md

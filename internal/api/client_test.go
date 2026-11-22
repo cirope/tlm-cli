@@ -21,6 +21,7 @@ const testToken Token = "tlmp_t0ken" //nolint:gosec // A fake token.
 // call is one request the fake server saw.
 type call struct {
 	Method, Path, Query string
+	RawPath             string // Before /api/v1 is taken off.
 	Header              http.Header
 	Body                string
 }
@@ -54,7 +55,7 @@ func (f *fake) serve(w http.ResponseWriter, r *http.Request) {
 	body, _ := io.ReadAll(r.Body)
 	path := strings.TrimPrefix(r.URL.EscapedPath(), "/api/v1")
 	f.mu.Lock()
-	f.calls = append(f.calls, call{r.Method, path, r.URL.RawQuery, r.Header.Clone(), string(body)})
+	f.calls = append(f.calls, call{r.Method, path, r.URL.RawQuery, r.URL.EscapedPath(), r.Header.Clone(), string(body)})
 	key := r.Method + " " + path
 	list := f.routes[key]
 	var a *answer
@@ -181,6 +182,25 @@ func TestMarkdownAndEmptyQueryValues(t *testing.T) {
 	}
 	if got := f.calls[0].Header.Get("Accept"); got != "text/markdown" {
 		t.Errorf("Accept = %q", got)
+	}
+}
+
+func TestAgentGuideIsOutsideTheAPI(t *testing.T) {
+	f := newFake(t, map[string][]*answer{"GET /agents.md": {{status: 200, body: "# Add Tlm to this app", headers: map[string]string{"Content-Type": "text/markdown"}}}})
+	c, _ := f.client(t, func(o *Options) { o.Token, o.Lang = "", "es" })
+	got, err := c.AgentGuide(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != "# Add Tlm to this app" {
+		t.Errorf("got %q", got)
+	}
+	if f.calls[0].RawPath != "/agents.md" {
+		t.Errorf("path = %q, want /agents.md", f.calls[0].RawPath)
+	}
+	h := f.calls[0].Header
+	if h.Get("Accept") != "text/markdown" || h.Get("Accept-Language") != "es" {
+		t.Errorf("headers = %v", h)
 	}
 }
 

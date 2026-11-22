@@ -107,6 +107,8 @@ const rootLong = `tlm manages Tlm from the terminal: projects and their setup,
 issues, speed, and source map uploads. For people, their coding agents
 and CI.
 
+Adding Tlm to an app? Start with: tlm guide
+
 Output is for people by default; --json prints Tlm's JSON as is, and
 --markdown Tlm's text for an AI, where offered.
 
@@ -123,7 +125,8 @@ func newRootCmd(a *app) *cobra.Command {
 		Use:   "tlm <command>",
 		Short: "Manage Tlm from the terminal",
 		Long:  rootLong,
-		Example: "  tlm login\n" +
+		Example: "  tlm guide\n" +
+			"  tlm login\n" +
 			"  tlm issues list --env production\n" +
 			"  tlm issues show 2C7ZffP787kc --markdown > issue.md\n" +
 			"  tlm upload ./dist --release \"$GIT_SHA\"",
@@ -180,7 +183,7 @@ func newRootCmd(a *app) *cobra.Command {
 		}
 	}
 	add("start", newLoginCmd(a), newLogoutCmd(a), newWhoamiCmd(a), newUseCmd(a))
-	add("setup", newProjectsCmd(a), newDSNCmd(a), newUploadTokensCmd(a), newOriginsCmd(a))
+	add("setup", newGuideCmd(a), newProjectsCmd(a), newDSNCmd(a), newUploadTokensCmd(a), newOriginsCmd(a))
 	add("work", newIssuesCmd(a), newSpeedCmd(a), newSignalsCmd(a))
 	add("ci", newUploadCmd(a), newTestCmd(a))
 	add("more", newOrgsCmd(a), newMembersCmd(a), newAuditCmd(a), newOpenCmd(a), newAPICmd(a), newVersionCmd(a))

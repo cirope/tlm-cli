@@ -41,6 +41,7 @@ fake-tlm projects.create.ok projects.create.invalid
 exits 0 tlm projects create Docs
 stdout '^Docs \(docs\)$'
 stdout '^DSN: http://tlm_test_key_docs@'
+stderr '^Next, add it to the app: tlm guide$'
 exits 1 tlm projects create ''
 stderr '^error: Some values aren''t valid\.$'
 stderr '^  name: can''t be blank$'

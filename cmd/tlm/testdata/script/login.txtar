@@ -6,6 +6,7 @@ exits 0 tlm login
 stdout '^Signed in to http://127\.0\.0\.1:\d+ as ada@example.com \(token "laptop", write access\)\.$'
 stderr '^First copy your one-time code: WDJB-MJHT$'
 stderr '^You''re in 2 organizations\. Pick one: tlm use <org>\[/<project>\]$'
+stderr '^Adding Tlm to an app\? tlm guide says how, step by step\.$'
 stderr '^Then open http://127\.0\.0\.1:\d+/login/device and enter it\.$'
 stderr 'No keychain found: the token is kept in .*tokens\.json, readable only by you\.'
 ! stderr dc_test_device_code

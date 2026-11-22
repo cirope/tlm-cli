@@ -89,6 +89,7 @@ func newProjectsCreateCmd(a *app) *cobra.Command {
 				return a.printJSON(raw)
 			}
 			a.printProject(p)
+			a.progress("Next, add it to the app: tlm guide")
 			return nil
 		},
 	}

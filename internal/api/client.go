@@ -167,6 +167,17 @@ func (c *Client) decode(data []byte, out any, method, path string) error {
 	return nil
 }
 
+// AgentGuide is Tlm's guide for AI agents to add Tlm to an app
+// (/agents.md, outside the API), as Markdown.
+func (c *Client) AgentGuide(ctx context.Context) (string, error) {
+	u, err := url.Parse(c.origin + "/agents.md")
+	if err != nil {
+		return "", fmt.Errorf("building the guide's address: %w", err)
+	}
+	data, _, err := c.send(ctx, http.MethodGet, u, nil, "text/markdown")
+	return string(data), err
+}
+
 // SendRaw sends payload as is with contentType, for `tlm api`.
 func (c *Client) SendRaw(ctx context.Context, method, path string, q Query, payload []byte) ([]byte, error) {
 	data, _, err := c.do(ctx, method, path, q, payload, "application/json")
@@ -181,6 +192,11 @@ func (c *Client) do(ctx context.Context, method, path string, q Query, payload [
 	if err != nil {
 		return nil, nil, err
 	}
+	return c.send(ctx, method, u, payload, accept)
+}
+
+// send is do for a URL already built.
+func (c *Client) send(ctx context.Context, method string, u *url.URL, payload []byte, accept string) ([]byte, *url.URL, error) {
 	redirects, failures, rateRetried := 0, 0, false
 	for {
 		resp, data, err := c.attempt(ctx, method, u, payload, accept)

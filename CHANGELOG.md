@@ -2,6 +2,10 @@
 
 What changed in each release of `tlm`, for the people who use it.
 
+## Unreleased
+
+- `tlm api --help` links to Tlm's API docs.
+
 ## 0.3.0
 
 - A repository names its project in `.tlm.toml` (`tlm use --here

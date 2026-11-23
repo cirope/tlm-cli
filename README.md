@@ -223,7 +223,8 @@ claude "Fix the error in issue.md. When the fix is merged, run: tlm issues resol
   `TLM_LANG`), else the install's language. The CLI's own text is
   English.
 - `tlm api <path>` makes a raw, authenticated request under `/api/v1`, for
-  anything without a command of its own.
+  anything without a command of its own: see
+  [Tlm's API docs](https://tlm.hullop.com/docs/api).
 - `tlm open issue <id>` prints (and, at a terminal, opens) the issue's
   page in the web app; also `open setup`, `open speed`, `open settings`.
 

@@ -94,11 +94,13 @@ for agents and `--markdown` for an AI, with stable exit codes.
 
 ### The server
 
-- `../tlm/docs/api.md` (the management API) and `../tlm/docs/protocol.md`
-  (events and source map uploads) are the binding contract.
+- Tlm serves its docs, the binding contract, in English and Spanish
+  (`?lang=en|es`): the management API at https://tlm.hullop.com/docs/api
+  and the ingestion protocol (events, source map uploads) at
+  https://tlm.hullop.com/docs/protocol. Add `.md` for the raw Markdown.
 - The fake Tlm in `internal/api/apitest` serves `../tlm`'s
   `test/cli_fixtures`, rendered by its real controllers. Copy them with
   `make fixtures-sync`; `make fixtures-check` says when they drifted.
 - A missing endpoint is built in `../tlm`, by its `AGENTS.md`. Don't work
-  around it from the CLI: agree its shape, have `docs/api.md` and the
+  around it from the CLI: agree its shape, have the API docs and the
   fixtures updated, then write the command.

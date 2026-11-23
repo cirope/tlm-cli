@@ -26,7 +26,8 @@ func newAPICmd(a *app) *cobra.Command {
 		Long: "A raw request under /api/v1, signed in as you, for anything without a\n" +
 			"command of its own. JSON answers are printed as is.\n\n" +
 			"-f key=value adds a query parameter to a GET, or a field of the JSON body\n" +
-			"otherwise. --input sends a file (- for stdin) as the body.",
+			"otherwise. --input sends a file (- for stdin) as the body.\n\n" +
+			"The endpoints: https://tlm.hullop.com/docs/api",
 		Example: "  tlm api /me\n" +
 			"  tlm api /orgs/acme/projects -f limit=100\n" +
 			"  tlm api /orgs/acme/projects/shop/issues/2C7ZffP787kc -X PATCH -f status=resolved",

@@ -65,11 +65,17 @@ func (a *app) printProject(p *api.Project) {
 }
 
 func newProjectsCreateCmd(a *app) *cobra.Command {
-	return &cobra.Command{
-		Use:     "create <name>",
-		Short:   "Create one (admins); prints its DSN",
-		Example: "  tlm projects create \"Web shop\"\n  tlm projects create Shop --org acme --json",
-		Args:    argsBetween(1, 1),
+	var origins []string
+	c := &cobra.Command{
+		Use:   "create <name>",
+		Short: "Create one (admins); prints its DSN",
+		Long: "Create a project and print its DSN. --origin allows the domains its\n" +
+			"web pages are served from, as tlm origins allow does (a bare host\n" +
+			"means https://).",
+		Example: "  tlm projects create \"Web shop\"\n" +
+			"  tlm projects create \"Web shop\" --origin shop.example.com --origin http://localhost:3000\n" +
+			"  tlm projects create Shop --org acme --json",
+		Args: argsBetween(1, 1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
 			cl, _, err := a.client()
@@ -86,13 +92,57 @@ func newProjectsCreateCmd(a *app) *cobra.Command {
 				return err
 			}
 			if a.flags.json {
-				return a.printJSON(raw)
+				if err := a.printJSON(raw); err != nil {
+					return err
+				}
+			} else {
+				a.printProject(p)
 			}
-			a.printProject(p)
+			if err := a.allowOrigins(ctx, cl, org, p.Slug, origins); err != nil {
+				return err
+			}
 			a.progress("Next, add it to the app: tlm guide")
 			return nil
 		},
 	}
+	c.Flags().StringArrayVar(&origins, "origin", nil, "allow browser events from this domain (repeatable)")
+	return c
+}
+
+// allowOrigins allows each origin for the project, one line each. Any
+// refusal is reported and the rest still go; it exits 1, or 3 if the
+// token was refused.
+func (a *app) allowOrigins(ctx context.Context, cl *api.Client, org, project string, origins []string) error {
+	code := ExitOK
+	for _, raw := range origins {
+		origin := originArg(raw)
+		var o api.Origin
+		_, err := cl.Send(ctx, http.MethodPut, api.ProjectPath(org, project)+"/origins", nil,
+			map[string]string{"origin": origin, "status": "allowed"}, &o)
+		if err != nil {
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+			a.reportError(fmt.Errorf("%s: %w", render.Safe(origin), err))
+			if c := exitCode(err); c == ExitAuth || code == ExitAuth {
+				code = ExitAuth
+			} else {
+				code = ExitError
+			}
+			continue
+		}
+		line := fmt.Sprintf("Allowed %s", render.Safe(o.Origin))
+		if a.flags.json {
+			a.progress("%s", line)
+		} else {
+			a.out("%s", line)
+		}
+	}
+	if code != ExitOK {
+		fmt.Fprintf(a.env.Stderr, "The project was created. Allow its domains with: tlm origins allow <origin> --project %s\n", render.Safe(project))
+		return silentError{code}
+	}
+	return nil
 }
 
 // fetchProject gets the project named by args (or implied).

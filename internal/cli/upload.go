@@ -34,20 +34,24 @@ func onlyUsageOrFailure(err error) error {
 func newUploadCmd(a *app) *cobra.Command {
 	var (
 		release, dsn, urlPrefix string
-		del, dryRun             bool
+		del, dryRun, sources    bool
 	)
 	c := &cobra.Command{
 		Use:   "upload <dir>",
 		Short: "Upload a build's source maps",
 		Long: "Upload the source maps under <dir>, so Tlm shows your own code in\n" +
 			"stack traces. Upload before you deploy.\n\n" +
+			"Apps that serve their JavaScript as written (importmap, no bundler)\n" +
+			"have no maps: --sources makes one line for line for each script that\n" +
+			"has none, holding its code. Minified scripts are skipped.\n\n" +
 			"Credentials: TLM_UPLOAD_TOKEN, an upload token read only from the\n" +
 			"environment (create one with tlm upload-tokens create). The DSN says\n" +
 			"where Tlm is.\n\n" +
 			"Exit codes: 0 everything uploaded, 1 something failed, 2 wrong usage.",
 		Example: "  TLM_UPLOAD_TOKEN=tlmu_… tlm upload ./dist --release \"$GIT_SHA\" --dsn \"$TLM_DSN\"\n" +
 			"  tlm upload ./dist --release 1.4.2 --url-prefix /assets --delete\n" +
-			"  tlm upload .next --release 1.4.2 --dry-run",
+			"  tlm upload .next --release 1.4.2 --dry-run\n" +
+			"  tlm upload public/assets --release \"$GIT_SHA\" --url-prefix /assets --sources",
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {
 				return usageError{errors.New("missing the directory to upload, e.g. tlm upload ./dist")}
@@ -55,7 +59,7 @@ func newUploadCmd(a *app) *cobra.Command {
 			return argsBetween(1, 1)(cmd, args)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return onlyUsageOrFailure(a.upload(cmd, args[0], release, dsn, urlPrefix, del, dryRun))
+			return onlyUsageOrFailure(a.upload(cmd, args[0], release, dsn, urlPrefix, del, dryRun, sources))
 		},
 	}
 	f := c.Flags()
@@ -64,10 +68,11 @@ func newUploadCmd(a *app) *cobra.Command {
 	f.StringVar(&urlPrefix, "url-prefix", "/", "the URL path <dir> is served at")
 	f.BoolVar(&del, "delete", false, "delete the .map files after a successful upload")
 	f.BoolVar(&dryRun, "dry-run", false, "show what would be uploaded, without sending anything")
+	f.BoolVar(&sources, "sources", false, "also map scripts that have no source map line for line, for code served as written (importmap)")
 	return c
 }
 
-func (a *app) upload(cmd *cobra.Command, dir, release, dsn, urlPrefix string, del, dryRun bool) error {
+func (a *app) upload(cmd *cobra.Command, dir, release, dsn, urlPrefix string, del, dryRun, sources bool) error {
 	ctx := cmd.Context()
 	release = trimmed(cmpOr(release, a.env.Getenv("TLM_RELEASE")))
 	if release == "" {
@@ -87,7 +92,7 @@ func (a *app) upload(cmd *cobra.Command, dir, release, dsn, urlPrefix string, de
 		}
 	}
 
-	found, err := sourcemaps.Find(dir, sourcemaps.FindOptions{URLPrefix: urlPrefix})
+	found, err := sourcemaps.Find(dir, sourcemaps.FindOptions{URLPrefix: urlPrefix, Sources: sources})
 	if err != nil {
 		return err
 	}
@@ -95,11 +100,18 @@ func (a *app) upload(cmd *cobra.Command, dir, release, dsn, urlPrefix string, de
 		a.warn("%s", render.Safe(w))
 	}
 	if len(found.Maps) == 0 {
-		return fmt.Errorf("no source maps found in %s. Turn them on in your bundler (e.g. build.sourcemap in Vite) and build again", dir)
+		if sources {
+			return fmt.Errorf("no scripts or source maps found in %s", dir)
+		}
+		return fmt.Errorf("no source maps found in %s. Turn them on in your bundler (e.g. build.sourcemap in Vite) and build again, or, for code served as written (importmap), pass --sources", dir)
 	}
 	if dryRun {
 		for _, m := range found.Maps {
-			a.out("would upload %s", render.Safe(m.Path))
+			how := ""
+			if m.Generated {
+				how = " (line for line)"
+			}
+			a.out("would upload %s%s", render.Safe(m.Path), how)
 		}
 		where := ""
 		if base != "" {

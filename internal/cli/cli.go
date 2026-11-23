@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -36,13 +37,19 @@ type Env struct {
 	Getenv func(string) string
 	Build  Build
 
-	ConfigDir   string       // The platform's user config directory; tlm uses ConfigDir/tlm.
+	ConfigDir string // The platform's user config directory; tlm uses ConfigDir/tlm.
+	// Dir is the working directory, where .tlm.toml is looked for from;
+	// "" looks for none.
+	Dir         string
 	Keyring     auth.Keyring // nil: tokens go to a file.
 	HTTPClient  *http.Client
 	OpenBrowser func(url string) error
-	Hostname    func() (string, error)
-	Now         func() time.Time
-	Location    *time.Location // Where times are shown for people.
+	// Exec runs a program with stdin, returning what it wrote to stdout
+	// and stderr; nil runs it for real.
+	Exec     func(ctx context.Context, stdin io.Reader, name string, args ...string) ([]byte, error)
+	Hostname func() (string, error)
+	Now      func() time.Time
+	Location *time.Location // Where times are shown for people.
 	// Sleep waits between retries and polls; tests make it instant.
 	Sleep func(context.Context, time.Duration) error
 
@@ -56,6 +63,12 @@ type Env struct {
 	// the update notice tells how to upgrade from how it was installed.
 	Executable string
 	GOOS       string // The operating system; "" is runtime.GOOS.
+}
+
+func execProgram(ctx context.Context, stdin io.Reader, name string, args ...string) ([]byte, error) {
+	cmd := exec.CommandContext(ctx, name, args...) //nolint:gosec // Programs tlm itself names, with arguments the person gave.
+	cmd.Stdin = stdin
+	return cmd.CombinedOutput()
 }
 
 // Run executes the command line args (without the program name) and
@@ -90,6 +103,9 @@ func withDefaults(env Env) Env {
 	}
 	if env.OpenBrowser == nil {
 		env.OpenBrowser = func(string) error { return nil }
+	}
+	if env.Exec == nil {
+		env.Exec = execProgram
 	}
 	if env.Hostname == nil {
 		env.Hostname = func() (string, error) { return "unknown", nil }

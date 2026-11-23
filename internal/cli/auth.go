@@ -200,6 +200,9 @@ func newWhoamiCmd(a *app) *cobra.Command {
 				from = " from TLM_TOKEN"
 			}
 			a.out("%s", render.Safe(fmt.Sprintf("Token %q%s: %s%s", me.Token.Name, from, accessText(me.Token.Access), only)))
+			if a.repoPath != "" {
+				a.out("Repository: %s (%s)", render.Safe(givenText(a.repo)), a.repoPath)
+			}
 			if d, ok := a.defaultFor(s.url); ok {
 				a.out("Default: %s", render.Safe(defaultText(d)))
 			}

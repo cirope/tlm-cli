@@ -29,6 +29,10 @@ type app struct {
 	store   auth.TokenStore
 	session *session
 	org     string // Once known, for error hints.
+	// repo is what the repository's .tlm.toml names, read by client.
+	repo     target.Given
+	repoPath string
+	repoRead bool
 	// noNotice: the command said whether there's a newer tlm already.
 	noNotice bool
 }
@@ -176,8 +180,24 @@ func (a *app) client() (*api.Client, *session, error) {
 	if s.token == "" {
 		return nil, nil, notSignedIn{s.url}
 	}
+	if err := a.readRepoFile(); err != nil {
+		return nil, nil, err
+	}
 	c, err := a.newClient(s.url, s.token, s.lang)
 	return c, s, err
+}
+
+// readRepoFile reads the repository's .tlm.toml, once.
+func (a *app) readRepoFile() error {
+	if a.env.Dir == "" || a.repoRead {
+		return nil
+	}
+	g, path, err := target.FindRepoFile(a.env.Dir)
+	if err != nil {
+		return err
+	}
+	a.repo, a.repoPath, a.repoRead = g, path, true
+	return nil
 }
 
 // resolver chooses the organization and project for c.
@@ -186,6 +206,7 @@ func (a *app) resolver(c *api.Client) *target.Resolver {
 		API:  c,
 		Flag: target.Given{Org: a.flags.org, Project: a.flags.project},
 		Env:  target.Given{Org: a.env.Getenv("TLM_ORG"), Project: a.env.Getenv("TLM_PROJECT")},
+		Repo: a.repo,
 	}
 	if d, ok := a.defaultFor(c.Origin()); ok {
 		r.Default = target.Given{Org: d.Org, Project: d.Project}

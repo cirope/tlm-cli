@@ -2,6 +2,21 @@
 
 What changed in each release of `tlm`, for the people who use it.
 
+## Unreleased
+
+- A repository names its project in `.tlm.toml` (`tlm use --here
+  acme/shop` writes it), found from the current directory up. It wins
+  over `tlm use`'s machine-wide default; `--org`, `--project`, `TLM_ORG`
+  and `TLM_PROJECT` still win over it.
+- `projects create --origin <host>` allows the app's domains as the
+  project is created (repeatable).
+- `upload-tokens create --gh-secret <name>` stores the new token as a
+  GitHub Actions secret through `gh secret set` (`--gh-env`,
+  `--gh-repo`), so it never shows or goes through a shell.
+- `upload --sources` maps scripts that have no source map line for line,
+  from their own code, for apps that serve JavaScript as written
+  (importmap). Minified ones are skipped with a warning.
+
 ## 0.2.0
 
 - `tlm guide` prints Tlm's step-by-step guide for AI agents to add Tlm

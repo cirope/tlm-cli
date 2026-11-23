@@ -63,7 +63,7 @@ func classify(err error) (int, string) {
 			kind = "error"
 		}
 		return ExitError, kind
-	case errors.As(err, &ue), errors.Is(err, target.ErrAmbiguous), errors.Is(err, target.ErrBadIssue):
+	case errors.As(err, &ue), errors.Is(err, target.ErrAmbiguous), errors.Is(err, target.ErrBadIssue), errors.Is(err, target.ErrBadRepoFile):
 		return ExitUsage, "usage"
 	case errors.As(err, &ns):
 		return ExitAuth, "unauthorized"

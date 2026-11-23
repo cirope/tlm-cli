@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -26,6 +27,7 @@ import (
 // and a config directory under $WORK.
 func TestMain(m *testing.M) {
 	testscript.Main(m, map[string]func(){
+		"gh": fakeGH,
 		"tlm": func() {
 			work := os.Getenv("WORK")
 			os.Exit(run(os.Args[1:], deps{
@@ -40,6 +42,23 @@ func TestMain(m *testing.M) {
 			}))
 		},
 	})
+}
+
+// fakeGH stands in for GitHub's gh: it appends its arguments and stdin
+// to $WORK/gh.log, and fails its FAKE_GH_FAIL command (auth, secret)
+// like a token without access.
+func fakeGH() {
+	in, _ := io.ReadAll(os.Stdin)
+	f, err := os.OpenFile(filepath.Join(os.Getenv("WORK"), "gh.log"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o600)
+	if err == nil {
+		_, _ = fmt.Fprintf(f, "args: %s\nstdin: %s\n", strings.Join(os.Args[1:], " "), in)
+		_ = f.Close()
+	}
+	if len(os.Args) > 1 && os.Getenv("FAKE_GH_FAIL") == os.Args[1] {
+		fmt.Fprintln(os.Stderr, "failed to set secret: HTTP 403: Resource not accessible by integration")
+		os.Exit(1)
+	}
+	os.Exit(0)
 }
 
 // Scripts run on Friday, 13 November 2026, at 12:05 UTC, five minutes

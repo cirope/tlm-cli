@@ -33,8 +33,12 @@ type Map struct {
 	BundleFile string
 	// Bytes is the size of what will be uploaded, uncompressed.
 	Bytes int64
-	// Content, when set, is uploaded instead of MapFile: an index map, flattened.
+	// Content, when set, is uploaded instead of MapFile: an index map,
+	// flattened, or a map made from the bundle itself.
 	Content []byte
+	// Generated is a map made from the bundle, line for line: there's no
+	// MapFile to delete.
+	Generated bool
 }
 
 // FindOptions says where a directory is served and which maps to skip.
@@ -44,6 +48,9 @@ type FindOptions struct {
 	URLPrefix string
 	// MaxMapBytes skips larger maps with a warning; 0 means MaxMapBytes.
 	MaxMapBytes int64
+	// Sources maps scripts that have no map of their own line for line,
+	// for apps that serve their code as written.
+	Sources bool
 }
 
 // Found is what Find found: the maps to upload, and warnings about the
@@ -127,6 +134,11 @@ func Find(dir string, opts FindOptions) (Found, error) {
 		}
 		m.Path = prefix + filepath.ToSlash(relativeTo(root, m.Path))
 		found.Maps = append(found.Maps, *m)
+	}
+	if opts.Sources {
+		if err := found.addSources(root, prefix, files, maxBytes); err != nil {
+			return Found{}, err
+		}
 	}
 	return found, nil
 }
@@ -261,9 +273,9 @@ func walk(root string) ([]string, error) {
 	return files, nil
 }
 
-// mapOfBundle is the local map a bundle's sourceMappingURL comment points
-// at, or "". Only the last kilobyte of the bundle is read.
-func mapOfBundle(bundle string) string {
+// mappingComment is what a bundle's sourceMappingURL comment says, or
+// "". Only the last kilobyte of the bundle is read.
+func mappingComment(bundle string) string {
 	f, err := os.Open(bundle) //nolint:gosec // G304: a file found under the directory the user named.
 	if err != nil {
 		return ""
@@ -283,8 +295,14 @@ func mapOfBundle(bundle string) string {
 	if match == nil {
 		return ""
 	}
-	ref := string(match[1])
-	if strings.HasPrefix(ref, "data:") || remoteURL.MatchString(ref) {
+	return string(match[1])
+}
+
+// mapOfBundle is the local map a bundle's sourceMappingURL comment points
+// at, or "".
+func mapOfBundle(bundle string) string {
+	ref := mappingComment(bundle)
+	if ref == "" || strings.HasPrefix(ref, "data:") || remoteURL.MatchString(ref) {
 		return ""
 	}
 	if i := strings.IndexAny(ref, "?#"); i >= 0 {
@@ -317,6 +335,9 @@ func exists(path string) bool {
 // bundles that point at them. It stops at the first error.
 func Delete(maps []Map) error {
 	for _, m := range maps {
+		if m.Generated {
+			continue
+		}
 		if err := os.Remove(m.MapFile); err != nil {
 			return fmt.Errorf("deleting %s: %w", m.MapFile, err)
 		}

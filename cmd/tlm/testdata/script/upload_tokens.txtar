@@ -23,3 +23,38 @@ stdout '^Revoked\.$'
 fake-tlm upload-tokens.list.forbidden
 exits 1 tlm upload-tokens list
 stderr '^ask an admin of acme$'
+
+# --gh-secret stores it as a GitHub secret through gh, on its stdin: the
+# secret never shows, nor goes through a shell.
+env TLM_TOKEN=tlmp_test_token_laptop
+fake-tlm upload-tokens.create.ok
+exits 0 tlm upload-tokens create 'GitHub Actions' --gh-secret TLM_UPLOAD_TOKEN --gh-env demo
+stdout '^Stored upload token "GitHub Actions" \(Upt7Kq2XpAb2\) as the GitHub secret TLM_UPLOAD_TOKEN \(environment demo\)\.$'
+! stdout tlmu_
+! stderr tlmu_
+grep '^args: secret set TLM_UPLOAD_TOKEN --env demo$' gh.log
+grep '^stdin: tlmu_test_upload_ci$' gh.log
+
+exits 0 tlm upload-tokens create 'GitHub Actions' --gh-secret TLM_UPLOAD_TOKEN --gh-repo cirope/shop
+grep '^args: secret set TLM_UPLOAD_TOKEN --repo cirope/shop$' gh.log
+
+# When gh fails, the new token is revoked: none is left that nobody has.
+env FAKE_GH_FAIL=secret
+fake-tlm upload-tokens.create.ok upload-tokens.revoke.ok
+exits 1 tlm upload-tokens create 'GitHub Actions' --gh-secret TLM_UPLOAD_TOKEN
+stderr '^error: couldn''t store it with gh secret set: failed to set secret: HTTP 403: Resource not accessible by integration'
+stderr 'revoked it'
+! stdout tlmu_
+! stderr tlmu_
+env FAKE_GH_FAIL=
+
+exits 2 tlm upload-tokens create CI --gh-env demo
+stderr '--gh-env and --gh-repo go with --gh-secret'
+exits 2 tlm upload-tokens create CI --gh-secret TLM_UPLOAD_TOKEN --json
+stderr '--gh-secret keeps the secret out of the output; drop --json'
+
+# Without gh signed in, nothing is created.
+env FAKE_GH_FAIL=auth
+fake-tlm me.ok
+exits 1 tlm upload-tokens create CI --gh-secret TLM_UPLOAD_TOKEN
+stderr '--gh-secret needs the GitHub CLI, signed in'

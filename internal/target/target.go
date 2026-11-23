@@ -1,6 +1,6 @@
 // Package target chooses the organization and project a command works
-// on: --org/--project, TLM_ORG/TLM_PROJECT, or the only one
-// there is. When it's ambiguous, the error lists the choices.
+// on: --org/--project, TLM_ORG/TLM_PROJECT, the repository's .tlm.toml,
+// tlm use's default, or the only one there is. When it's ambiguous, the error lists the choices.
 package target
 
 import (
@@ -36,8 +36,9 @@ type Resolver struct {
 	API  API
 	Flag Given // --org, --project
 	Env  Given // TLM_ORG, TLM_PROJECT
-	// Default is what tlm use stored; its project belongs to its
-	// org only.
+	// Repo is what the repository's .tlm.toml names, and Default what
+	// tlm use stored; each one's project belongs to its own org only.
+	Repo    Given
 	Default Given
 
 	org string
@@ -45,7 +46,7 @@ type Resolver struct {
 
 // Org is the organization.
 func (r *Resolver) Org(ctx context.Context) (string, error) {
-	if g := first(r.Flag.Org, r.Env.Org, r.Default.Org); g != "" {
+	if g := first(r.Flag.Org, r.Env.Org, r.Repo.Org, r.Default.Org); g != "" {
 		return g, nil
 	}
 	if r.org != "" {
@@ -69,8 +70,8 @@ func (r *Resolver) Project(ctx context.Context, org string) (string, error) {
 	if g := first(r.Flag.Project, r.Env.Project); g != "" {
 		return g, nil
 	}
-	if r.Default.Project != "" && org == r.Default.Org {
-		return r.Default.Project, nil
+	if p := r.impliedProject(org); p != "" {
+		return p, nil
 	}
 	page, err := r.API.Projects(ctx, org, api.Query{"limit": "100"}, false)
 	if err != nil {
@@ -94,8 +95,19 @@ func (r *Resolver) Both(ctx context.Context) (org, project string, err error) {
 
 // Explicit reports whether both were named, so nothing need be asked.
 func (r *Resolver) Explicit() bool {
-	org := first(r.Flag.Org, r.Env.Org, r.Default.Org)
-	return org != "" && (first(r.Flag.Project, r.Env.Project) != "" || (r.Default.Project != "" && org == r.Default.Org))
+	org := first(r.Flag.Org, r.Env.Org, r.Repo.Org, r.Default.Org)
+	return org != "" && (first(r.Flag.Project, r.Env.Project) != "" || r.impliedProject(org) != "")
+}
+
+// impliedProject is the project the repository file, else tlm use, names
+// for org.
+func (r *Resolver) impliedProject(org string) string {
+	for _, g := range []Given{r.Repo, r.Default} {
+		if g.Org == org && g.Project != "" {
+			return g.Project
+		}
+	}
+	return ""
 }
 
 func first(vals ...string) string {

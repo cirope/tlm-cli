@@ -55,6 +55,10 @@ func run(args []string, d deps) int {
 	if err != nil {
 		configDir = "" // Commands that need it say so.
 	}
+	dir, err := os.Getwd()
+	if err != nil {
+		dir = "" // No .tlm.toml.
+	}
 	cacheDir, err := d.cacheDir()
 	if err != nil {
 		cacheDir = "" // No update notice.
@@ -66,6 +70,7 @@ func run(args []string, d deps) int {
 		Getenv:           os.Getenv,
 		Build:            cli.Build{Version: version, Commit: commit, Date: date},
 		ConfigDir:        configDir,
+		Dir:              dir,
 		Keyring:          d.keyring,
 		HTTPClient:       &http.Client{},
 		OpenBrowser:      d.openBrowser,

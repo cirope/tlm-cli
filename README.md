@@ -95,10 +95,12 @@ than tlm.hullop.com.
 ```sh
 tlm projects list
 tlm projects create "Web shop"       # admins; prints the new project's DSN
+tlm projects create "Web shop" --origin shop.example.com   # and allows its domain
 tlm projects show web
 tlm dsn                              # only the DSN: TLM_DSN=$(tlm dsn)
 
 tlm upload-tokens create "GitHub Actions"   # admins; prints the secret once
+tlm upload-tokens create "GitHub Actions" --gh-secret TLM_UPLOAD_TOKEN   # or stores it in GitHub
 tlm upload-tokens list
 tlm upload-tokens revoke <id>
 
@@ -110,6 +112,11 @@ tlm origins forget https://old.example.com
 tlm projects edit web --name Storefront   # admins; the slug stays
 tlm projects mute web                     # its issue emails off, for you (unmute: back on)
 ```
+
+`--gh-secret` hands the secret to the GitHub CLI (`gh secret set`, of the
+repository in the current directory, or `--gh-repo owner/name`, and
+`--gh-env` for an environment's secret), so it never shows or goes
+through a shell. If `gh` fails, the new token is revoked.
 
 Deleting a project and rotating its DSN stay in the web app.
 
@@ -127,11 +134,30 @@ tlm members remove bob@example.com            # asks first, or --yes
 tlm audit                                     # who did what (admins)
 ```
 
-People are added in the web app. The organization and project come from
-`--org` and `--project` (or `TLM_ORG` and `TLM_PROJECT`), else the default
-you set with `tlm use acme/shop` (per Tlm; `tlm use --clear` forgets it).
-When you're in only one organization, or it has only one project, you
-don't need any of them; when it's ambiguous, the error lists the choices.
+People are added in the web app.
+
+## Which project
+
+The organization and project come from `--org` and `--project` (or
+`TLM_ORG` and `TLM_PROJECT`), else the repository's `.tlm.toml`, else the
+default you set with `tlm use acme/shop` (per Tlm; `tlm use --clear`
+forgets it). When you're in only one organization, or it has only one
+project, you don't need any of them; when it's ambiguous, the error lists
+the choices.
+
+```sh
+tlm use --here acme/shop   # writes .tlm.toml here: commit it
+tlm use                    # what commands use, and where it comes from
+tlm use --here --clear     # removes it
+```
+
+`.tlm.toml` is found from the current directory up, so it works anywhere
+in the repository:
+
+```toml
+org = "acme"
+project = "shop"
+```
 
 ## Issues
 
@@ -224,11 +250,20 @@ TLM_UPLOAD_TOKEN=tlmu_… TLM_DSN=https://tlm_…@tlm.hullop.com \
 | `--url-prefix` | `/` | The URL path the directory is served at, e.g. `/static/` |
 | `--delete` | off | Delete the `.map` files (and the comments pointing at them) after a successful upload |
 | `--dry-run` | off | List what would be uploaded, send nothing |
+| `--sources` | off | Also map each script that has no map line for line, from its own code: for apps that serve JavaScript as written (importmap) |
 
 It finds every `.map` file under the directory and pairs it with its bundle
 (by the bundle's `sourceMappingURL` comment, the map's `file` field, or the
 name). Index maps (Turbopack) are flattened. Maps without `sourcesContent`
 get a warning; maps over 20 MB are skipped.
+
+Rails with importmap (no bundler) serves its JavaScript as written, so
+there are no maps to upload: `--sources` makes them.
+
+```sh
+bin/rails assets:precompile
+tlm upload public/assets --url-prefix /assets --release "$GIT_SHA" --sources
+```
 
 With Vite, set the release at build time and keep the maps out of the
 bundle, then upload and delete them:

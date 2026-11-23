@@ -1,0 +1,55 @@
+# A repository names its project in .tlm.toml, found from the current
+# directory up, so two apps on one machine need no --project.
+env TLM_TOKEN=tlmp_test_token_laptop
+fake-tlm project.get.ok issues.list.empty project.get.not_found me.ok
+
+cd shop/app/javascript
+exits 0 tlm issues list nothing matches this
+stdout 'No unresolved issues'
+
+exits 0 tlm use
+stdout '^acme/shop, from .*shop[/\\]\.tlm\.toml$'
+
+exits 0 tlm whoami
+stdout '^Repository: acme/shop \(.*shop[/\\]\.tlm\.toml\)$'
+
+# --org and --project, and TLM_ORG and TLM_PROJECT, still win.
+exits 0 tlm projects show
+stdout '^Shop \(shop\)$'
+exits 1 tlm projects show --project nope
+stderr 'That doesn''t exist'
+
+# The machine's default doesn't get in its way.
+fake-tlm orgs.get.ok project.get.ok issues.list.empty
+exits 0 tlm use acme
+exits 0 tlm issues list nothing matches this
+stdout 'No unresolved issues'
+
+# tlm use --here writes it, checked against Tlm first; --clear removes it.
+cd $WORK/other
+fake-tlm project.get.ok project.get.not_found
+exits 0 tlm use --here acme/shop
+stdout '^Commands in .*other now use acme/shop: commit .*other[/\\]\.tlm\.toml\.$'
+grep '^org = "acme"$' .tlm.toml
+grep '^project = "shop"$' .tlm.toml
+exits 1 tlm use --here acme/nope
+grep '^project = "shop"$' .tlm.toml
+exits 0 tlm use --here --clear
+stdout '^Removed .*other[/\\]\.tlm\.toml\.$'
+! exists .tlm.toml
+exits 0 tlm use --here --clear
+stdout '^No \.tlm\.toml here\.$'
+
+# A broken file is a usage mistake, named with its line.
+cd $WORK/broken
+exits 2 tlm issues list
+stderr '\.tlm\.toml:1: expected key = "value"'
+
+-- shop/.tlm.toml --
+# The Tlm project of this repository
+org = "acme"
+project = "shop"
+-- shop/app/javascript/.keep --
+-- other/.keep --
+-- broken/.tlm.toml --
+project: shop

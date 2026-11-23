@@ -2,7 +2,7 @@
 
 What changed in each release of `tlm`, for the people who use it.
 
-## Unreleased
+## 0.2.0
 
 - `tlm guide` prints Tlm's step-by-step guide for AI agents to add Tlm
   to an app, without signing in. `tlm --help`, `login` and

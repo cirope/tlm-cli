@@ -7,6 +7,13 @@ What changed in each release of `tlm`, for the people who use it.
 - `tlm guide` prints Tlm's step-by-step guide for AI agents to add Tlm
   to an app, without signing in. `tlm --help`, `login` and
   `projects create` point to it.
+- `upload` sends to the DSN without its key, path included, as `test`
+  does: a Tlm served under a path gets its source maps there. It needs a
+  DSN (`--dsn` or `TLM_DSN`), except with `--dry-run`, instead of
+  falling back to tlm.hullop.com.
+- `test` sends its event as platform `other`, so it no longer shows a
+  project as Node.
+- `issues list --platform` mentions `ruby`.
 
 ## 0.1.0
 

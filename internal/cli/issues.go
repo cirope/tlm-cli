@@ -174,7 +174,7 @@ func newIssuesListCmd(a *app) *cobra.Command {
 	fl.StringVar(&f.status, "status", "", "unresolved (default), resolved or ignored")
 	fl.StringVar(&f.rng, "range", "", "seen in the last day, week or month, or all (default)")
 	fl.StringVar(&f.env, "env", "", "only this environment")
-	fl.StringVar(&f.platform, "platform", "", "the platform of its first event: elixir, javascript, node, other")
+	fl.StringVar(&f.platform, "platform", "", "the platform of its first event: elixir, javascript, node, ruby, other")
 	fl.StringVar(&f.release, "release", "", "only issues this release introduced")
 	fl.StringVar(&f.q, "search", "", "text in the title, message or culprit (or give it as words)")
 	l.add(c)

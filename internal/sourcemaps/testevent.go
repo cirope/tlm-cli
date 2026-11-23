@@ -102,7 +102,7 @@ func SendTestEvent(ctx context.Context, opts TestEventOptions) (TestEventResult,
 		return TestEventResult{}, newUsageError("invalid DSN: expected something like https://tlm_…@tlm.hullop.com (copy it from your project's setup page).")
 	}
 	key := u.User.Username()
-	base := origin(u) + strings.TrimRight(u.EscapedPath(), "/")
+	base := baseOf(u)
 
 	host := opts.Hostname
 	if host == "" {
@@ -112,7 +112,7 @@ func SendTestEvent(ctx context.Context, opts TestEventOptions) (TestEventResult,
 		V:           1,
 		UUID:        uuid.NewV4().String(),
 		Timestamp:   time.Now().UTC().Format("2006-01-02T15:04:05.000Z"),
-		Platform:    "node",
+		Platform:    "other",
 		Level:       "error",
 		Server:      host,
 		Environment: opts.Environment,

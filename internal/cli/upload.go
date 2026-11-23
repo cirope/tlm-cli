@@ -60,7 +60,7 @@ func newUploadCmd(a *app) *cobra.Command {
 	}
 	f := c.Flags()
 	f.StringVar(&release, "release", "", "the release your app reports, exactly (or $TLM_RELEASE)")
-	f.StringVar(&dsn, "dsn", "", "your project's DSN, to find Tlm (or $TLM_DSN)")
+	f.StringVar(&dsn, "dsn", "", "your project's DSN: where Tlm is (or $TLM_DSN)")
 	f.StringVar(&urlPrefix, "url-prefix", "/", "the URL path <dir> is served at")
 	f.BoolVar(&del, "delete", false, "delete the .map files after a successful upload")
 	f.BoolVar(&dryRun, "dry-run", false, "show what would be uploaded, without sending anything")
@@ -73,15 +73,18 @@ func (a *app) upload(cmd *cobra.Command, dir, release, dsn, urlPrefix string, de
 	if release == "" {
 		return usageError{errors.New("missing --release (or TLM_RELEASE). Use the same value your app reports as its release")}
 	}
-	dsn = trimmed(cmpOr(dsn, a.env.Getenv("TLM_DSN")))
-	host, err := sourcemaps.HostFromDSN(dsn)
-	if err != nil {
-		return usageError{err}
-	}
 	// CI secrets are often pasted with a trailing newline.
 	token := sourcemaps.Token(trimmed(a.env.Getenv("TLM_UPLOAD_TOKEN")))
 	if token == "" && !dryRun {
 		return usageError{errors.New("missing TLM_UPLOAD_TOKEN. Create an upload token with tlm upload-tokens create, or in your project's settings")}
+	}
+	dsn = trimmed(cmpOr(dsn, a.env.Getenv("TLM_DSN")))
+	base := ""
+	if dsn != "" || !dryRun {
+		var err error
+		if base, err = sourcemaps.BaseFromDSN(dsn); err != nil {
+			return usageError{err}
+		}
 	}
 
 	found, err := sourcemaps.Find(dir, sourcemaps.FindOptions{URLPrefix: urlPrefix})
@@ -98,13 +101,17 @@ func (a *app) upload(cmd *cobra.Command, dir, release, dsn, urlPrefix string, de
 		for _, m := range found.Maps {
 			a.out("would upload %s", render.Safe(m.Path))
 		}
-		a.out("%d map(s) for release %s to %s (dry run: nothing sent)", len(found.Maps), render.Safe(release), host)
+		where := ""
+		if base != "" {
+			where = " to " + render.Safe(base)
+		}
+		a.out("%d map(s) for release %s%s (dry run: nothing sent)", len(found.Maps), render.Safe(release), where)
 		return nil
 	}
 
 	res := sourcemaps.Upload(ctx, found.Maps, sourcemaps.Options{
 		Release:    release,
-		Host:       host,
+		Host:       base,
 		Token:      token,
 		HTTPClient: a.env.HTTPClient,
 		Log:        func(line string) { a.out("%s", render.Safe(line)) },

@@ -16,9 +16,6 @@ import (
 	"strings"
 )
 
-// DefaultHost is Tlm's address when no DSN says otherwise.
-const DefaultHost = "https://tlm.hullop.com"
-
 // ErrUsage matches (with errors.Is) every *UsageError: a mistake in how the
 // tool was called, which the command reports with exit code 2.
 var ErrUsage = errors.New("usage error")

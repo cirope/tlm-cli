@@ -41,6 +41,24 @@ for agents and `--markdown` for an AI, with stable exit codes.
   Franco cuts a release (`make release`). Give him the commands; never
   publish yourself.
 
+### Work tracking
+
+- The work is tracked with the `trk` CLI (already signed in), on the board
+  **"Telemetría"**. It's a tool we use, not a code reference: never name it
+  in code, tests or docs
+- Everything written there is in neutral Spanish (tú, no regionalisms) and
+  without Spanglish: "aplicación", never "app"; "versión", not "release";
+  "tarea", not "job"; "credencial", not "token". Only names stay as they
+  are (products, code, commands, environment variables), plus "framework",
+  "source maps" and "stack trace"
+- Every card is created with the agent off, so its agent never duplicates
+  our work: `trk card new --board Telemetría "<título>" --take --no-pull`
+  (take turns the agent off and moves it to In progress); for work not
+  started yet, then `trk card move <id> todo`
+- Built but not published stays In progress; once it's out, move each card
+  where it belongs (`trk card move`, `trk card done --yes`)
+- Infrastructure lives in `../infra`; Franco handles it
+
 ### Go
 
 - The standard library first.

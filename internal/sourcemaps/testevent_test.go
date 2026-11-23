@@ -87,7 +87,7 @@ func TestSendTestEventSendsABearerEventAndPrintsTheID(t *testing.T) {
 	tags, _ := b["tags"].(map[string]any)
 	sdk, _ := b["sdk"].(map[string]any)
 	fp, _ := b["fingerprint"].([]any)
-	if b["v"] != 1.0 || b["platform"] != "node" || b["level"] != "error" || b["server"] != "box" ||
+	if b["v"] != 1.0 || b["platform"] != "other" || b["level"] != "error" || b["server"] != "box" ||
 		exception["type"] != "TlmTest" ||
 		exception["message"] != "Test event from tlm test. If you can see it in Tlm, your setup works." ||
 		tags["tlm.test"] != "true" || len(fp) != 1 || fp[0] != "tlm.test" ||

@@ -519,31 +519,34 @@ func TestUploadDefaultSleepHonoursTheContext(t *testing.T) {
 	}
 }
 
-func TestHostFromDSN(t *testing.T) {
+// Uploads go to the DSN without its key, path included.
+func TestBaseFromDSN(t *testing.T) {
 	for _, tc := range []struct{ dsn, want string }{
 		{"http://tlm_abc@localhost:4000", "http://localhost:4000"},
 		{"https://tlm_abc@tlm.hullop.com", "https://tlm.hullop.com"},
-		{"https://tlm_abc@Tlm.Hullop.COM:443/tlm?x#y", "https://tlm.hullop.com"},
-		{"", DefaultHost},
+		{"https://tlm_abc@example.com/tlm", "https://example.com/tlm"},
+		{"https://tlm_abc@example.com/tlm/", "https://example.com/tlm"},
+		{"https://tlm_abc@Tlm.Hullop.COM:443/tlm?x#y", "https://tlm.hullop.com/tlm"},
 	} {
-		got, err := HostFromDSN(tc.dsn)
+		got, err := BaseFromDSN(tc.dsn)
 		if err != nil || got != tc.want {
-			t.Errorf("HostFromDSN(%q) = %q, %v; want %q", tc.dsn, got, err, tc.want)
+			t.Errorf("BaseFromDSN(%q) = %q, %v; want %q", tc.dsn, got, err, tc.want)
 		}
 	}
 	for _, tc := range []struct{ dsn, want string }{
+		{"", "missing --dsn (or TLM_DSN)"},
 		{"not a dsn", "invalid DSN: expected something like https://tlm_…@tlm.hullop.com (copy it from your project's setup page)."},
 		{"http://", "invalid DSN: expected something like"},
 		{"ftp://x@y", "invalid DSN: it must start with https:// (or http:// for a local Tlm)."},
 	} {
-		_, err := HostFromDSN(tc.dsn)
+		_, err := BaseFromDSN(tc.dsn)
 		if !errors.Is(err, ErrUsage) {
-			t.Errorf("HostFromDSN(%q) err = %v, want a usage error", tc.dsn, err)
+			t.Errorf("BaseFromDSN(%q) err = %v, want a usage error", tc.dsn, err)
 			continue
 		}
 		var ue *UsageError
 		if !errors.As(err, &ue) || !strings.HasPrefix(err.Error(), tc.want) {
-			t.Errorf("HostFromDSN(%q) err = %q, want %q", tc.dsn, err, tc.want)
+			t.Errorf("BaseFromDSN(%q) err = %q, want %q", tc.dsn, err, tc.want)
 		}
 	}
 }
@@ -561,5 +564,23 @@ func TestTokenRedactsItself(t *testing.T) {
 	b, err := json.Marshal(struct{ T Token }{tok})
 	if err != nil || strings.Contains(string(b), "hidden") {
 		t.Errorf("json = %s, %v", b, err)
+	}
+}
+
+// A Tlm served under a path gets the upload under that path.
+func TestUploadKeepsTheBasePath(t *testing.T) {
+	dir := writeTree(t, map[string]string{"a.js": "x", "a.js.map": testMap("a.js", nil)})
+	found, err := Find(dir, FindOptions{URLPrefix: "/"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	srv := startServer(t, nil)
+	if res := Upload(context.Background(), found.Maps, Options{
+		Release: "r1", Host: srv.URL + "/tlm", Token: testToken, HTTPClient: srv.Client(),
+	}); !res.OK {
+		t.Fatalf("result = %+v", res)
+	}
+	if got := srv.received()[0].URL; got != "/tlm/api/sourcemaps" {
+		t.Errorf("path = %q, want /tlm/api/sourcemaps", got)
 	}
 }

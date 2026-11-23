@@ -40,7 +40,7 @@ const maxErrorBody = 64 * 1024
 type Options struct {
 	// Release is the release the maps belong to, exactly as the SDK sends it.
 	Release string
-	// Host is Tlm's base URL, e.g. from HostFromDSN.
+	// Host is Tlm's base URL, from BaseFromDSN.
 	Host string
 	// Token is an upload token (tlmu_…). Surrounding whitespace (a pasted CI
 	// secret) is ignored.
@@ -403,18 +403,24 @@ func sleepContext(ctx context.Context, d time.Duration) error {
 	}
 }
 
-// HostFromDSN is Tlm's base URL from a project's DSN:
-// https://tlm_…@host:port becomes https://host:port. An empty DSN means
-// DefaultHost. A DSN that isn't one is a *UsageError.
-func HostFromDSN(dsn string) (string, error) {
+// BaseFromDSN is Tlm's base URL from a project's DSN, which is the DSN
+// without its key: https://tlm_…@host:port/path becomes
+// https://host:port/path. A missing DSN, or one that isn't one, is a
+// *UsageError.
+func BaseFromDSN(dsn string) (string, error) {
 	if dsn == "" {
-		return DefaultHost, nil
+		return "", newUsageError("missing --dsn (or TLM_DSN). Copy the DSN from your project's setup page, or get it with tlm dsn.")
 	}
 	u, err := parseDSN(dsn)
 	if err != nil {
 		return "", err
 	}
-	return origin(u), nil
+	return baseOf(u), nil
+}
+
+// baseOf is the DSN u without its key, and without a trailing slash.
+func baseOf(u *url.URL) string {
+	return origin(u) + strings.TrimRight(u.EscapedPath(), "/")
 }
 
 func parseDSN(dsn string) (*url.URL, error) {

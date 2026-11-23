@@ -148,7 +148,7 @@ tlm issues assign 2C7ZffP787kc me                # an email, me, or none
 ```
 
 Filters for `issues list`: `--status unresolved|resolved|ignored`,
-`--range day|week|month|all`, `--env`, `--platform elixir|javascript|node|other`,
+`--range day|week|month|all`, `--env`, `--platform elixir|javascript|node|ruby|other`,
 `--release` (the release that introduced the issue) and `--search` (text
 in the title, message or culprit; or give it as words). An issue id or URL
 alone works without `--org` and `--project`.
@@ -220,7 +220,7 @@ TLM_UPLOAD_TOKEN=tlmu_… TLM_DSN=https://tlm_…@tlm.hullop.com \
 | Option | Default | |
 |---|---|---|
 | `--release` | `TLM_RELEASE` | Required. The release your app reports |
-| `--dsn` | `TLM_DSN` | Your project's DSN |
+| `--dsn` | `TLM_DSN` | Required (except with `--dry-run`). Your project's DSN: where Tlm is, path included |
 | `--url-prefix` | `/` | The URL path the directory is served at, e.g. `/static/` |
 | `--delete` | off | Delete the `.map` files (and the comments pointing at them) after a successful upload |
 | `--dry-run` | off | List what would be uploaded, send nothing |

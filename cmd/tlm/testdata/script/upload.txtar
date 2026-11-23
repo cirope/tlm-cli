@@ -1,10 +1,13 @@
 env TLM_ORG=acme
 env TLM_PROJECT=shop
 
-# A dry run needs no credentials and sends nothing.
+# A dry run needs no credentials and sends nothing. The DSN says where
+# Tlm is, path included.
 exits 0 tlm upload dist --release web@1.4.2 --dry-run
 stdout '^would upload /assets/index-a1b2c3d4\.js$'
-stdout '^1 map\(s\) for release web@1\.4\.2 to https://tlm\.hullop\.com \(dry run: nothing sent\)$'
+stdout '^1 map\(s\) for release web@1\.4\.2 \(dry run: nothing sent\)$'
+exits 0 tlm upload dist --release web@1.4.2 --dry-run --dsn https://tlm_x@example.com/tlm
+stdout '^1 map\(s\) for release web@1\.4\.2 to https://example\.com/tlm \(dry run: nothing sent\)$'
 
 # Only an upload token uploads: a personal token isn't enough.
 env TLM_TOKEN=tlmp_test_token_laptop
@@ -16,6 +19,11 @@ exits 2 tlm upload dist
 stderr 'missing --release'
 exits 2 tlm upload
 stderr 'missing the directory to upload'
+
+# Without a DSN there's nowhere to send them.
+env TLM_UPLOAD_TOKEN=tlmu_test_upload_ci
+exits 2 tlm upload dist --release web@1.4.2
+stderr 'missing --dsn \(or TLM_DSN\)'
 
 # The token from the environment, Tlm from the DSN.
 env TLM_UPLOAD_TOKEN=tlmu_test_upload_ci

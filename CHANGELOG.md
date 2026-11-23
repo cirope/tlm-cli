@@ -2,7 +2,7 @@
 
 What changed in each release of `tlm`, for the people who use it.
 
-## Unreleased
+## 0.4.0
 
 - `issues delete <id>` deletes an issue and all its events, for good
   (admins), for when an event brought something that must not be kept.

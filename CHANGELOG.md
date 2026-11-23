@@ -2,7 +2,7 @@
 
 What changed in each release of `tlm`, for the people who use it.
 
-## Unreleased
+## 0.3.0
 
 - A repository names its project in `.tlm.toml` (`tlm use --here
   acme/shop` writes it), found from the current directory up. It wins

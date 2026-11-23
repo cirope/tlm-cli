@@ -40,6 +40,9 @@ for agents and `--markdown` for an AI, with stable exit codes.
 - **CHANGELOG under `## Unreleased`.** Versions are bumped only when
   Franco cuts a release (`make release`). Give him the commands; never
   publish yourself.
+- **Always say whether to release.** At the end of every change, say
+  whether it's worth releasing now and give the exact command
+  (`make release`, `BUMP=minor`/`major` or `V=x.y.z`), with why.
 
 ### Work tracking
 

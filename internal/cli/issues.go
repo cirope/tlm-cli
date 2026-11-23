@@ -26,7 +26,7 @@ func newIssuesCmd(a *app) *cobra.Command {
 		newIssuesStatusCmd(a, "resolve", "resolved", "Mark resolved"),
 		newIssuesStatusCmd(a, "ignore", "ignored", "Mark ignored"),
 		newIssuesStatusCmd(a, "reopen", "unresolved", "Mark unresolved again"),
-		newIssuesAssignCmd(a))
+		newIssuesAssignCmd(a), newIssuesDeleteCmd(a))
 }
 
 func issuePath(org, project, id string) string {
@@ -490,4 +490,51 @@ func newIssuesAssignCmd(a *app) *cobra.Command {
 			})
 		},
 	}
+}
+
+func newIssuesDeleteCmd(a *app) *cobra.Command {
+	var yes bool
+	c := &cobra.Command{
+		Use:   "delete <id|url>",
+		Short: "Delete it with all its events, for good (admins)",
+		Long: "Delete an issue and every one of its events, for good: it can't be\n" +
+			"undone. For when an event brought something that must not be kept (an\n" +
+			"issue keeps its first event's message as its title). The issue goes at\n" +
+			"once and its events are purged in the background; the next event like\n" +
+			"them opens a new issue. It shows the issue and asks first, or --yes.",
+		Example: "  tlm issues delete 2C7ZffP787kc\n  tlm issues delete 2C7ZffP787kc --yes",
+		Args:    argsBetween(1, 1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			cl, _, err := a.client()
+			if err != nil {
+				return err
+			}
+			path, err := a.showPath(ctx, cl, args[0])
+			if err != nil {
+				return err
+			}
+			var i api.Issue
+			if _, path, err = cl.GetAt(ctx, path, nil, &i); err != nil {
+				return err
+			}
+			if org, ok := orgOf(path); ok {
+				a.org = org
+			}
+			what := fmt.Sprintf("%s (%s) and its %s", i.ID, headline(&i), plural(i.EventsCount, "event"))
+			if err := a.confirm(yes, render.Safe("Delete "+what+", for good? This can't be undone.")); err != nil {
+				return err
+			}
+			if _, err := cl.Send(ctx, http.MethodDelete, path, nil, nil, nil); err != nil {
+				return err
+			}
+			if !a.flags.json {
+				a.out("%s", render.Safe("Deleted "+what+"."))
+			}
+			a.progress("Its events are purged in the background, and the next event like them opens a new issue.")
+			return nil
+		},
+	}
+	addYes(c, &yes)
+	return c
 }

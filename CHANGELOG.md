@@ -2,6 +2,12 @@
 
 What changed in each release of `tlm`, for the people who use it.
 
+## Unreleased
+
+- `issues delete <id>` deletes an issue and all its events, for good
+  (admins), for when an event brought something that must not be kept.
+  It shows the issue and asks first, or takes `--yes`.
+
 ## 0.3.1
 
 - `tlm api --help` links to Tlm's API docs.

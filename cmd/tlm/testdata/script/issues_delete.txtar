@@ -1,0 +1,39 @@
+env TLM_TOKEN=tlmp_test_token_laptop
+env TLM_ORG=acme
+env TLM_PROJECT=shop
+
+# Deleting can't be undone: without a terminal to ask at, only --yes.
+fake-tlm issue.get.ok issue.delete.ok
+exits 2 tlm issues delete Err7Kq2XpAb2
+stderr 'pass --yes'
+
+exits 0 tlm issues delete Err7Kq2XpAb2 --yes
+stdout '^Deleted Err7Kq2XpAb2 \(Ecto\.NoResultsError: expected at least one result but got none in query:⏎⏎from o0 in Shop\.Order,⏎  where: o0\.token == \^"k3J"\) and its 1 event\.$'
+stderr 'events are purged in the background'
+stderr 'next event like them opens a new issue'
+
+# A merged issue's id deletes the issue it was merged into: the same
+# issue, as it's shown before asking.
+fake-tlm issue.get.merged issue.get.ok issue.delete.ok
+exits 0 tlm issues delete Mrg9Pq4ZrCd4 -y
+stdout '^Deleted Err7Kq2XpAb2 '
+
+# Admins only.
+env TLM_TOKEN=tlmp_test_token_bob
+fake-tlm issue.get.ok issue.delete.forbidden
+exits 1 tlm issues delete Err7Kq2XpAb2 --yes
+stderr '^error: Your role here doesn''t allow it\.$'
+stderr '^ask an admin of acme$'
+
+# Gone between showing it and deleting it.
+fake-tlm issue.get.ok issue.delete.not_found
+exits 1 tlm issues delete Err7Kq2XpAb2 --yes
+stderr '^error: That doesn''t exist, or this token can''t see it\.$'
+
+fake-tlm issue.get.not_found
+exits 1 tlm issues delete Nope7Kq2XpAb --yes
+stderr 'That doesn''t exist'
+
+# One at a time.
+exits 2 tlm issues delete Err7Kq2XpAb2 Err8Mn3YqBc3 --yes
+stderr 'unexpected arguments: Err8Mn3YqBc3'

@@ -171,6 +171,7 @@ tlm issues events 2C7ZffP787kc
 tlm issues event 2C7ZffP787kc <uuid>             # one event in full (--markdown too)
 tlm issues resolve 2C7ZffP787kc 9Hk2LmQp4RsT     # also: ignore, reopen
 tlm issues assign 2C7ZffP787kc me                # an email, me, or none
+tlm issues delete 2C7ZffP787kc                   # admins: it and all its events, for good
 ```
 
 Filters for `issues list`: `--status unresolved|resolved|ignored`,
@@ -178,6 +179,13 @@ Filters for `issues list`: `--status unresolved|resolved|ignored`,
 `--release` (the release that introduced the issue) and `--search` (text
 in the title, message or culprit; or give it as words). An issue id or URL
 alone works without `--org` and `--project`.
+
+`issues delete` is for when an event brought something that must not be
+kept (an issue keeps its first event's message as its title). It can't be
+undone: it shows the issue and its event count and asks first, or takes
+`--yes` (without a terminal it needs `--yes`). The issue goes at once, its
+events are purged in the background, and the next event like them opens a
+new issue.
 
 ## Speed and signs of life
 

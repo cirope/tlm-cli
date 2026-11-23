@@ -2,7 +2,7 @@
 
 What changed in each release of `tlm`, for the people who use it.
 
-## Unreleased
+## 0.3.1
 
 - `tlm api --help` links to Tlm's API docs.
 

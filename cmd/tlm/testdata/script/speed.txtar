@@ -15,10 +15,9 @@ stdout '"p75": 0.05000000074505806'
 ! stdout 'Slowest'
 
 exits 0 tlm speed pages
-stdout '^ROUTE      LOAD  VIEWS  LCP     NAV  INP$'
-stdout '^/checkout  hard  1      5\.20 s  —    —$'
-stdout '^/          hard  2      2\.60 s  —    150 ms$'
-! stderr 'More:'
+stdout '^ROUTE      LOAD  VIEWS  LCP     NAV     INP     NAV CLS$'
+stdout '^/checkout  hard  1      5\.20 s  —       —       —$'
+stdout '^/checkout  soft  1      —       840 ms  —       0\.02$'
 exits 0 tlm speed pages --json
 stdout '"route": "/checkout"'
 stdout '"next_cursor": null'
@@ -31,10 +30,20 @@ stdout '"failed": 0\.3333333333333333'
 
 # The drill-downs: the route goes as a query value.
 exits 0 tlm speed page /checkout
-stdout '^/checkout · 1 page view$'
-stdout '^LCP    5\.20 s  0%    0%          100%  1$'
-stdout '^TTFB   —       —     —           —     0$'
-stdout '^desktop  1      100%   5\.20 s  —$'
+stdout '/checkout · 2 page views'
+stdout 'VITAL    P75     GOOD  NEEDS WORK  POOR  SAMPLES'
+stdout 'LCP      5\.20 s  0%    0%          100%  1'
+stdout 'INP      —       —     —           —     0'
+stdout 'CLS      —       —     —           —     0'
+stdout 'TTFB     —       —     —           —     0'
+stdout 'NAV      840 ms  100%  0%          0%    1'
+stdout 'NAV CLS  0\.02    100%  0%          0%    1'
+stdout 'Devices'
+stdout 'DEVICE   VIEWS  SHARE  LCP     NAV'
+stdout 'desktop  1      50%    5\.20 s  —'
+stdout 'phone    1      50%    —       840 ms'
+stdout 'Slow visits'
+stdout '^WHEN    DEVICE   BROWSER  COUNTRY  RELEASE  LCP     NAV  SESSION       PAGE VIEW$'
 stdout '^5m ago  desktop  Firefox  AR       6c5717a  5\.20 s  —    session-0003  pageview-0003$'
 exits 0 tlm speed page /checkout --json
 stdout '"slow_visits": \['
@@ -73,17 +82,19 @@ exits 2 tlm speed pages --limit 500
 stderr '--limit must be 1 to 100'
 
 -- overview.txt --
-production · last week · all devices · 3 page views
+production · last week · all devices · 4 page views
 
-VITAL  P75     GOOD  NEEDS WORK  POOR  SAMPLES
-LCP    5.20 s  33%   33%         33%   3
-INP    150 ms  100%  0%          0%    2
-CLS    0.05    100%  0%          0%    2
+VITAL    P75     GOOD  NEEDS WORK  POOR  SAMPLES
+LCP      5.20 s  33%   33%         33%   3
+INP      150 ms  100%  0%          0%    2
+CLS      0.05    100%  0%          0%    2
+NAV CLS  0.02    100%  0%          0%    1
 
 Slowest pages
-ROUTE      LOAD  VIEWS  LCP     NAV  INP
-/checkout  hard  1      5.20 s  —    —
-/          hard  2      2.60 s  —    150 ms
+ROUTE      LOAD  VIEWS  LCP     NAV     INP     NAV CLS
+/checkout  hard  1      5.20 s  —       —       —
+/          hard  2      2.60 s  —       150 ms  —
+/checkout  soft  1      —       840 ms  —       0.02
 
 Slowest requests
 METHOD  ROUTE      CALLS  FAILED  P75     START

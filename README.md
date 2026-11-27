@@ -204,6 +204,11 @@ tlm speed request GET /api/cart
 tlm signals                     # when each environment's servers and browsers were last heard from
 ```
 
+The vitals are LCP, INP and CLS for page loads, and for in-app navigations
+NAV (how long the move took) and NAV CLS (layout shifts in the 500 ms after
+the click; CLS leaves those out). CLS and NAV CLS are scores; the rest are
+times. A vital shows "—" until enough page views have it.
+
 ## Using it with an agent
 
 To add Tlm to an app, hand the agent Tlm's guide: install and sign in,

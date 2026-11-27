@@ -279,7 +279,15 @@ func speedHeadline(o *api.SpeedOverview) string {
 }
 
 // vitalOrder is how vitals are listed; any others follow by name.
-var vitalOrder = []string{"lcp", "inp", "cls", "fcp", "ttfb", "nav"}
+var vitalOrder = []string{"lcp", "inp", "cls", "fcp", "ttfb", "nav", "nav_cls"}
+
+// vitalNames is how a vital is shown; those not here are their id in
+// capitals.
+var vitalNames = map[string]string{"nav_cls": "NAV CLS"}
+
+// scoreVitals are unitless, shown with two decimals; the others are
+// times.
+var scoreVitals = map[string]bool{"cls": true, "nav_cls": true}
 
 func vitalsTable(vs map[string]api.Vital) string {
 	names := slices.DeleteFunc(slices.Clone(vitalOrder), func(n string) bool { _, ok := vs[n]; return !ok })
@@ -292,17 +300,18 @@ func vitalsTable(vs map[string]api.Vital) string {
 	for _, n := range names {
 		v := vs[n]
 		p75 := millis(v.P75)
-		if n == "cls" {
-			p75 = "—"
-			if v.P75 != nil {
-				p75 = strconv.FormatFloat(*v.P75, 'f', 2, 64)
-			}
+		if scoreVitals[n] {
+			p75 = score(v.P75)
+		}
+		name, ok := vitalNames[n]
+		if !ok {
+			name = strings.ToUpper(n)
 		}
 		if v.Samples == 0 {
-			rows = append(rows, []string{strings.ToUpper(n), p75, "—", "—", "—", "0"})
+			rows = append(rows, []string{name, p75, "—", "—", "—", "0"})
 			continue
 		}
-		rows = append(rows, []string{strings.ToUpper(n), p75, percent(v.Good), percent(v.NeedsWork), percent(v.Poor), strconv.Itoa(v.Samples)})
+		rows = append(rows, []string{name, p75, percent(v.Good), percent(v.NeedsWork), percent(v.Poor), strconv.Itoa(v.Samples)})
 	}
 	return render.Table([]string{"VITAL", "P75", "GOOD", "NEEDS WORK", "POOR", "SAMPLES"}, rows)
 }
@@ -310,9 +319,9 @@ func vitalsTable(vs map[string]api.Vital) string {
 func speedPagesTable(ps []api.SpeedPage) string {
 	rows := make([][]string, 0, len(ps))
 	for _, p := range ps {
-		rows = append(rows, []string{p.Route, p.Navigation, count(p.Views), millis(p.LCP), millis(p.Nav), millis(p.INP)})
+		rows = append(rows, []string{p.Route, p.Navigation, count(p.Views), millis(p.LCP), millis(p.Nav), millis(p.INP), score(p.NavCLS)})
 	}
-	return render.Table([]string{"ROUTE", "LOAD", "VIEWS", "LCP", "NAV", "INP"}, rows)
+	return render.Table([]string{"ROUTE", "LOAD", "VIEWS", "LCP", "NAV", "INP", "NAV CLS"}, rows)
 }
 
 func speedRequestsTable(rs []api.SpeedRequest) string {
@@ -321,6 +330,14 @@ func speedRequestsTable(rs []api.SpeedRequest) string {
 		rows = append(rows, []string{r.Method, r.Route, count(r.Calls), percent(r.Failed), millis(r.P75), millis(r.Start)})
 	}
 	return render.Table([]string{"METHOD", "ROUTE", "CALLS", "FAILED", "P75", "START"}, rows)
+}
+
+// score shows a unitless vital with two decimals; "—" when there's none.
+func score(v *float64) string {
+	if v == nil {
+		return "—"
+	}
+	return strconv.FormatFloat(*v, 'f', 2, 64)
 }
 
 // millis shows a time in ms: "150 ms" under a second, else "2.40 s";

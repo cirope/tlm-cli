@@ -2,6 +2,13 @@
 
 What changed in each release of `tlm`, for the people who use it.
 
+## Unreleased
+
+- `tlm speed` shows `NAV CLS`, the layout shifts in the 500 ms after the
+  click that started an in-app navigation (which CLS leaves out), as a
+  score next to `NAV`: in the overview, in `speed page` and as a column
+  of `speed pages`.
+
 ## 0.5.0
 
 - `tlm guide --stack <id>` shows the general steps and one stack's part

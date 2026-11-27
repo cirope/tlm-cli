@@ -2,9 +2,10 @@ package api
 
 import "encoding/json"
 
-// Vital is one Web Vital over a speed query: its p75 (ms, or unitless
-// for CLS; nil with no samples), the shares of rated page views that
-// were good, need work or poor, and how many page views have it.
+// Vital is one Web Vital over a speed query: its p75 (ms, or a unitless
+// score for the layout shift vitals, cls and nav_cls; nil with no
+// samples), the shares of rated page views that were good, need work or
+// poor, and how many page views have it.
 type Vital struct {
 	P75       *float64 `json:"p75"`
 	Good      float64  `json:"good"`
@@ -33,6 +34,10 @@ type SpeedPage struct {
 	LCP        *float64 `json:"lcp"`
 	Nav        *float64 `json:"nav"`
 	INP        *float64 `json:"inp"`
+	// NavCLS is the layout shift within 500 ms of the click that started
+	// an in-app navigation; nil without samples.
+	NavCLS        *float64 `json:"nav_cls"`
+	NavCLSSamples int      `json:"nav_cls_samples"`
 }
 
 // SpeedRequest is one row of GET …/speed/requests, slowest p75 first.

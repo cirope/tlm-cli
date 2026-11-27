@@ -16,7 +16,7 @@
       "sample_rates": [
         1.0
       ],
-      "views": 3,
+      "views": 4,
       "vitals": {
         "cls": {
           "good": 1.0,
@@ -38,6 +38,13 @@
           "p75": 5200,
           "poor": 0.3333333333333333,
           "samples": 3
+        },
+        "nav_cls": {
+          "good": 1.0,
+          "needs_work": 0.0,
+          "p75": 0.020999999716877937,
+          "poor": 0.0,
+          "samples": 1
         }
       }
     }

@@ -15,8 +15,17 @@
           "lcp_samples": 1,
           "nav": null,
           "nav_samples": 0,
-          "share": 1.0,
+          "share": 0.5,
           "value": "desktop",
+          "views": 1
+        },
+        {
+          "lcp": null,
+          "lcp_samples": 0,
+          "nav": 840,
+          "nav_samples": 1,
+          "share": 0.5,
+          "value": "phone",
           "views": 1
         }
       ],
@@ -34,7 +43,7 @@
           "session": "session-0003"
         }
       ],
-      "views": 1,
+      "views": 2,
       "vitals": {
         "cls": {
           "good": 0.0,
@@ -58,11 +67,18 @@
           "samples": 1
         },
         "nav": {
-          "good": 0.0,
+          "good": 1.0,
           "needs_work": 0.0,
-          "p75": null,
+          "p75": 840,
           "poor": 0.0,
-          "samples": 0
+          "samples": 1
+        },
+        "nav_cls": {
+          "good": 1.0,
+          "needs_work": 0.0,
+          "p75": 0.020999999716877937,
+          "poor": 0.0,
+          "samples": 1
         },
         "ttfb": {
           "good": 0.0,

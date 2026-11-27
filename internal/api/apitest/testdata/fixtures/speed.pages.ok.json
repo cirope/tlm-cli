@@ -13,6 +13,8 @@
           "lcp": 5200,
           "lcp_samples": 1,
           "nav": null,
+          "nav_cls": null,
+          "nav_cls_samples": 0,
           "nav_samples": 0,
           "navigation": "hard",
           "route": "/checkout",
@@ -24,10 +26,25 @@
           "lcp": 2600,
           "lcp_samples": 2,
           "nav": null,
+          "nav_cls": null,
+          "nav_cls_samples": 0,
           "nav_samples": 0,
           "navigation": "hard",
           "route": "/",
           "views": 2
+        },
+        {
+          "inp": null,
+          "inp_samples": 0,
+          "lcp": null,
+          "lcp_samples": 0,
+          "nav": 840,
+          "nav_cls": 0.020999999716877937,
+          "nav_cls_samples": 1,
+          "nav_samples": 1,
+          "navigation": "soft",
+          "route": "/checkout",
+          "views": 1
         }
       ],
       "next_cursor": null

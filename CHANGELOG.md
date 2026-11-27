@@ -2,7 +2,7 @@
 
 What changed in each release of `tlm`, for the people who use it.
 
-## Unreleased
+## 0.5.0
 
 - `tlm guide --stack <id>` shows the general steps and one stack's part
   only (`elixir`, `node`, `javascript`, `ruby`, `other`; several with

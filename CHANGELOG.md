@@ -2,7 +2,7 @@
 
 What changed in each release of `tlm`, for the people who use it.
 
-## Unreleased
+## 0.5.1
 
 - `tlm speed` shows `NAV CLS`, the layout shifts in the 500 ms after the
   click that started an in-app navigation (which CLS leaves out), as a

@@ -1,0 +1,39 @@
+# --stack asks Tlm for one stack's part; several, comma-separated, go
+# out as %2C; --lang rides along.
+fake-guide
+exits 0 tlm guide --url $URL --stack ruby
+grep 'GET /agents\.md\?stack=ruby HTTP' $LOG/guide.log
+exits 0 tlm guide --url $URL --stack elixir,node --lang es
+grep 'GET /agents\.md\?stack=elixir%2Cnode HTTP' $LOG/guide.log
+grep 'Accept-Language: es' $LOG/guide.log
+
+exits 2 tlm guide --url $URL --stack rails
+stderr 'unknown stack "rails": use elixir, node, javascript, ruby, other'
+
+# Without --stack, the stack is read from the current directory only
+# (a Rails app with assets/package.json is still ruby); from its assets
+# folder, node and the browser.
+mkdir rails/assets
+cp gemfile rails/Gemfile
+cp $WORK/pkg rails/assets/package.json
+cd rails
+exits 0 tlm guide --url $URL
+grep 'GET /agents\.md\?stack=ruby HTTP' $LOG/guide.log
+cd assets
+exits 0 tlm guide --url $URL
+grep 'GET /agents\.md\?stack=node%2Cjavascript HTTP' $LOG/guide.log
+
+# Two manifests side by side, or none: the whole guide.
+cd $WORK
+cp gemfile mix.exs
+mkdir empty
+cp gemfile empty/Gemfile
+cp $WORK/pkg empty/package.json
+cd empty
+exits 0 tlm guide --url $URL
+grep 'GET /agents\.md HTTP' $LOG/guide.log
+
+-- gemfile --
+source "https://rubygems.org"
+-- pkg --
+{"name":"assets"}

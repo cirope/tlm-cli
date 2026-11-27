@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -79,6 +81,7 @@ func TestScripts(t *testing.T) {
 		},
 		Cmds: map[string]func(ts *testscript.TestScript, neg bool, args []string){
 			"exits":        exits,
+			"fake-guide":   fakeGuide,
 			"fake-tlm":     fakeTlm,
 			"fixture-body": fixtureBody,
 		},
@@ -144,6 +147,39 @@ func fakeTlm(ts *testscript.TestScript, neg bool, args []string) {
 	ts.Setenv("URL", srv.URL)
 	ts.Setenv("DSN", strings.Replace(srv.URL, "://", "://tlm_test_key_shop@", 1))
 	ts.Defer(st.cleanup)
+}
+
+// fakeGuide starts a server that answers /agents.md with a line of
+// Markdown, writing each request's line and headers to $LOG/guide.log,
+// and points $URL at it:
+//
+//	fake-guide
+func fakeGuide(ts *testscript.TestScript, neg bool, args []string) {
+	if neg || len(args) != 0 {
+		ts.Fatalf("usage: fake-guide")
+	}
+	// Scripts change directories: the log lives in the script's own, $LOG.
+	logDir := ts.Getenv("WORK")
+	ts.Setenv("LOG", logDir)
+	log, err := os.OpenFile(filepath.Join(logDir, "guide.log"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o600)
+	if err != nil {
+		ts.Fatalf("fake-guide: %v", err)
+	}
+	ts.Defer(func() { _ = log.Close() })
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/agents.md" {
+			http.NotFound(w, r)
+			return
+		}
+		fmt.Fprintf(log, "GET %s HTTP/1.1\n", r.URL.RequestURI())
+		for k, v := range r.Header {
+			fmt.Fprintf(log, "%s: %s\n", k, v[0])
+		}
+		w.Header().Set("Content-Type", "text/markdown")
+		_, _ = w.Write([]byte("# Add Tlm to this app\n"))
+	}))
+	ts.Defer(srv.Close)
+	ts.Setenv("URL", srv.URL)
 }
 
 // scriptT adapts a script to what apitest needs. The server's complaints

@@ -94,7 +94,8 @@
         "session": null,
         "tags": {
           "node": "shop@ip-10-0-1-12"
-        }
+        },
+        "viewport": null
       },
       "received_at": "2026-11-13T12:00:00Z",
       "release": "v57",

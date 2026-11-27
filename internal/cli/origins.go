@@ -9,10 +9,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const originsLong = `The web page origins a project's browser events come from, and what
+Tlm does with them. Admins.
+
+Events from an origin nobody answered yet are kept, and its admins are
+asked, by email and on the project's page, to allow or block it. An
+allowed origin's events are kept for good; a blocked origin's events are
+refused (403). Allow an app's domains ahead of time, so it never waits.
+
+An origin is a scheme and a host, with an optional port; a bare host
+means https://. A wildcard host, '*.example.com', matches every subdomain,
+with the same scheme and port, not example.com itself, which needs its own
+origin.`
+
 func newOriginsCmd(a *app) *cobra.Command {
-	return group(a, "origins", "Allowed domains of browser events (admins)",
-		"  tlm origins list\n  tlm origins allow shop.example.com",
+	c := group(a, "origins", "Allowed domains of browser events (admins)",
+		"  tlm origins list\n  tlm origins allow shop.example.com\n  tlm origins allow '*.example.com'",
 		newOriginsListCmd(a), newOriginsPutCmd(a, "allowed"), newOriginsPutCmd(a, "blocked"), newOriginsForgetCmd(a))
+	c.Long = originsLong
+	return c
 }
 
 // originArg is what the person typed as an origin: a bare host means
@@ -57,10 +72,13 @@ func newOriginsPutCmd(a *app, status string) *cobra.Command {
 		use, short = "block", "Drop browser events from it"
 	}
 	return &cobra.Command{
-		Use:     use + " <origin>",
-		Short:   short,
-		Example: "  tlm origins " + use + " shop.example.com\n  tlm origins " + use + " http://localhost:5173",
-		Args:    argsBetween(1, 1),
+		Use:   use + " <origin>",
+		Short: short,
+		Long:  originsLong,
+		Example: "  tlm origins " + use + " shop.example.com\n" +
+			"  tlm origins " + use + " http://localhost:5173\n" +
+			"  tlm origins " + use + " '*.example.com'",
+		Args: argsBetween(1, 1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
 			cl, org, project, err := a.project(ctx, "")
@@ -84,8 +102,10 @@ func newOriginsPutCmd(a *app, status string) *cobra.Command {
 
 func newOriginsForgetCmd(a *app) *cobra.Command {
 	return &cobra.Command{
-		Use:     "forget <origin>",
-		Short:   "Forget it: its next event asks again",
+		Use:   "forget <origin>",
+		Short: "Forget it: its next event asks again",
+		Long: "Forget an allowed or blocked origin, so its next event waits for the\n" +
+			"admins' answer again, as a new one does.",
 		Example: "  tlm origins forget shop.example.com",
 		Args:    argsBetween(1, 1),
 		RunE: func(cmd *cobra.Command, args []string) error {

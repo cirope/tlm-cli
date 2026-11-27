@@ -168,11 +168,16 @@ func (c *Client) decode(data []byte, out any, method, path string) error {
 }
 
 // AgentGuide is Tlm's guide for AI agents to add Tlm to an app
-// (/agents.md, outside the API), as Markdown.
-func (c *Client) AgentGuide(ctx context.Context) (string, error) {
+// (/agents.md, outside the API), as Markdown. With stacks, the general
+// steps and those stacks' sections only; without, the whole guide.
+func (c *Client) AgentGuide(ctx context.Context, stacks []string) (string, error) {
 	u, err := url.Parse(c.origin + "/agents.md")
 	if err != nil {
 		return "", fmt.Errorf("building the guide's address: %w", err)
+	}
+	if len(stacks) > 0 {
+		// Commas separate stacks, so the value must go out as %2C.
+		u.RawQuery = "stack=" + strings.Join(stacks, "%2C")
 	}
 	data, _, err := c.send(ctx, http.MethodGet, u, nil, "text/markdown")
 	return string(data), err

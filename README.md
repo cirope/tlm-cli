@@ -106,6 +106,7 @@ tlm upload-tokens revoke <id>
 
 tlm origins list                      # the project's allowed domains (admins)
 tlm origins allow shop.example.com    # a bare host means https://
+tlm origins allow '*.example.com'     # every subdomain, not example.com itself
 tlm origins block http://localhost:3000
 tlm origins forget https://old.example.com
 
@@ -117,6 +118,11 @@ tlm projects mute web                     # its issue emails off, for you (unmut
 repository in the current directory, or `--gh-repo owner/name`, and
 `--gh-env` for an environment's secret), so it never shows or goes
 through a shell. If `gh` fails, the new token is revoked.
+
+Events from an origin nobody answered yet are kept, and the project's admins
+are asked, by email and on its page, to allow or block it; a blocked
+origin's events are refused (403). A wildcard matches every subdomain, with
+the same scheme and port, but not the domain itself: allow it too.
 
 Deleting a project and rotating its DSN stay in the web app.
 
@@ -204,6 +210,12 @@ To add Tlm to an app, hand the agent Tlm's guide: install and sign in,
 pick the project, add Tlm in the app's language (package, settings, speed,
 source maps in CI), then check it worked. It needs no sign-in and holds
 nothing secret; `--lang es` asks for it in Spanish.
+
+`tlm guide` covers every stack. `--stack ruby` (or `elixir`, `node`,
+`javascript`, `other`; several with commas) shows the general steps and
+that stack only. Without the flag, `tlm guide` reads the stack from the
+current directory: `Gemfile`, `mix.exs`, or `package.json` (Node and the
+browser). With several of those or none, it shows the whole guide.
 
 ```sh
 tlm guide > TLM.md

@@ -188,7 +188,7 @@ func TestMarkdownAndEmptyQueryValues(t *testing.T) {
 func TestAgentGuideIsOutsideTheAPI(t *testing.T) {
 	f := newFake(t, map[string][]*answer{"GET /agents.md": {{status: 200, body: "# Add Tlm to this app", headers: map[string]string{"Content-Type": "text/markdown"}}}})
 	c, _ := f.client(t, func(o *Options) { o.Token, o.Lang = "", "es" })
-	got, err := c.AgentGuide(context.Background())
+	got, err := c.AgentGuide(context.Background(), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -202,6 +202,28 @@ func TestAgentGuideIsOutsideTheAPI(t *testing.T) {
 	if h.Get("Accept") != "text/markdown" || h.Get("Accept-Language") != "es" {
 		t.Errorf("headers = %v", h)
 	}
+}
+
+// The stacks asked for are a query parameter; none asks for the whole
+// guide.
+func TestAgentGuideStacks(t *testing.T) {
+	f := newFake(t, map[string][]*answer{"GET /agents.md": {ok("# Hi"), ok("# Hi")}})
+	c, _ := f.client(t)
+	for _, want := range []string{"stack=ruby", ""} {
+		if _, err := c.AgentGuide(context.Background(), nonEmpty("ruby", want == "")); err != nil {
+			t.Fatal(err)
+		}
+		if got := f.calls[len(f.calls)-1].Query; got != want {
+			t.Errorf("query = %q, want %q", got, want)
+		}
+	}
+}
+
+func nonEmpty(v string, no bool) []string {
+	if no {
+		return nil
+	}
+	return []string{v}
 }
 
 func TestErrorShape(t *testing.T) {

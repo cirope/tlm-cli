@@ -2,6 +2,16 @@
 
 What changed in each release of `tlm`, for the people who use it.
 
+## Unreleased
+
+- `tlm guide --stack <id>` shows the general steps and one stack's part
+  only (`elixir`, `node`, `javascript`, `ruby`, `other`; several with
+  commas). Without the flag, the stack is read from the current
+  directory (`Gemfile`, `mix.exs`, `package.json`); with several or none,
+  the whole guide.
+- `tlm origins --help` explains wildcard origins and what happens to
+  events from an origin nobody answered yet.
+
 ## 0.4.0
 
 - `issues delete <id>` deletes an issue and all its events, for good
